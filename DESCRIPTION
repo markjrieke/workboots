@@ -1,20 +1,33 @@
 Package: workboots
-Title: Generate bootstrap prediction intervals from a tidymodels workflow!
+Title: Generate bootstrap prediction intervals from a 'tidymodels' workflow!
 Version: 0.0.0.9000
 Authors@R:
     person(given = "Mark",
            family = "Rieke",
            role = c("aut", "cre"),
            email = "markjrieke@gmail.com")
-Description: Provides functions for generating bootstrap prediction intervals
-    from a tidymodels workflow. 'tidymodels' <https://www.tidymodels.org/> is
-    a collection of packages for modeling and machine learning using 'tidyverse'
-    <https://www.tidyverse.org/> principles. This package is not affiliated with
-    or maintained by RStudio or the tidymodels maintainers.
+Description: Provides functions for generating bootstrap prediction
+    intervals from a 'tidymodels' workflow. 'tidymodels'
+    <https://www.tidymodels.org/> is a collection of packages for modeling
+    and machine learning using 'tidyverse' <https://www.tidyverse.org/>
+    principles. This package is not affiliated with or maintained by
+    RStudio or the tidymodels maintainers.
 License: MIT + file LICENSE
 URL: https://github.com/markjrieke/workboots
 BugReports: https://github.com/markjrieke/workboots/issues
+Imports:
+    dplyr,
+    generics,
+    purrr,
+    rlang,
+    rsample,
+    stats,
+    tibble,
+    tidyr,
+    vip,
+    workflows
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+
