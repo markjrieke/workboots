@@ -1,0 +1,13 @@
+---
+title: "workboots"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Author:** [Mark Rieke](https://www.thedatadiary.net/about/) <br/>
+**License:** [MIT](https://github.com/markjrieke/workboots/blob/main/LICENSE)
+
+
