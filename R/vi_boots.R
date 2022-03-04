@@ -65,8 +65,7 @@ vi_boots <- function(workflow,
       ~vi_single_boot(
         workflow = workflow,
         boot_splits = training_boots,
-        index = .x,
-        seed = seed
+        index = .x
       )
     )
 
@@ -79,6 +78,8 @@ vi_boots <- function(workflow,
   return(bootstrap_vi)
 
 }
+
+# -------------------------------internals--------------------------------------
 
 #' Fit a model and get the variable importance based on a single bootstrap resample
 #'
