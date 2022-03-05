@@ -14,11 +14,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   warning = FALSE,
-  message = FALSE,
-  cache = TRUE,
-  fig.width = 9,
-  fig.height = 6,
-  dpi = 500
+  message = FALSE
 )
 
 ggplot2::theme_set(

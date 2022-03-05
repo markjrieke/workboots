@@ -1,5 +1,5 @@
 Package: workboots
-Title: Generate bootstrap prediction intervals from a 'tidymodels' workflow!
+Title: Generate Bootstrap Prediction Intervals from a 'tidymodels' Workflow!
 Version: 0.0.0.9000
 Authors@R:
     person(given = "Mark",
@@ -34,5 +34,6 @@ Suggests:
     ggplot2,
     knitr,
     rmarkdown,
-    tidymodels
+    tidymodels,
+    xgboost
 VignetteBuilder: knitr
