@@ -1,3 +1,7 @@
 globalVariables(c(
-  "model", ".pred", "variable"
+  ".pred",
+  "interval",
+  "model",
+  "pred_level",
+  "variable"
 ))
