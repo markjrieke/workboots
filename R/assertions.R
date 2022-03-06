@@ -21,13 +21,13 @@ assert_workflow <- function(workflow) {
 assert_tune <- function(workflow, index) {
 
   # get model arg (need to know if it's NULL or not)
-  model_arg <- rlang::eval_tidy(workflow$fit$actions$model$spec$args[[index]])
+  model_arg <- as.character(rlang::eval_tidy(workflow$fit$actions$model$spec$args[[index]]))
 
   # don't check if NULL
-  if (!is.null(model_arg)) {
+  if (length(model_arg) != 0) {
 
     assertthat::assert_that(
-      rlang::eval_tidy(workflow$fit$actions$model$spec$args[[index]]) != tune(),
+      model_arg != "tune",
       msg = "all tuning parameters must be final."
     )
 
