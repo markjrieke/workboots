@@ -3,7 +3,7 @@ assert_workflow <- function(workflow) {
 
   # assert that object is actually a workflow
   assertthat::assert_that(
-    class(workflow) == "workflow",
+    assertthat::are_equal(class(workflow), "workflow"),
     msg = "argument `workflow` must be of class \"workflow\"."
   )
 
@@ -86,11 +86,10 @@ assert_summary_data <- function(data) {
     msg = "col `.preds` must be a list-col."
   )
 
-  # check for col model.pred within .preds
-  # (checks the first row as proxy for others)
+  # check that model.pred is numeric
   assertthat::assert_that(
-    !is.null(data$.preds[[1]]$model.pred),
-    msg = "col `model.pred` missing from list `.preds`."
+    class(data$.preds[[1]]$model.pred) == "numeric",
+    msg = "col `model.pred` must be numeric."
   )
 
 }
