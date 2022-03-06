@@ -49,6 +49,11 @@ vi_boots <- function(workflow,
                      training_data,
                      ...) {
 
+  # check arguments
+  assert_workflow(workflow)
+  assert_n(n)
+  assert_pred_data(workflow, training_data)
+
   # create resamples from training set
   training_boots <-
     rsample::bootstraps(
