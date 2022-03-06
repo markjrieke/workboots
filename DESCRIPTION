@@ -16,6 +16,7 @@ License: MIT + file LICENSE
 URL: https://github.com/markjrieke/workboots
 BugReports: https://github.com/markjrieke/workboots/issues
 Imports:
+    assertthat,
     dplyr,
     generics,
     purrr,
@@ -33,7 +34,11 @@ RoxygenNote: 7.1.2
 Suggests: 
     ggplot2,
     knitr,
+    recipes,
     rmarkdown,
+    testthat (>= 3.0.0),
     tidymodels,
+    tune,
     xgboost
 VignetteBuilder: knitr
+Config/testthat/edition: 3

@@ -45,6 +45,12 @@ predict_boots <- function(workflow,
                           new_data,
                           ...) {
 
+  # check arguments
+  assert_workflow(workflow)
+  assert_n(n)
+  assert_pred_data(workflow, training_data)
+  assert_pred_data(workflow, new_data)
+
   # create resamples from training set
   training_boots <-
     rsample::bootstraps(
@@ -74,13 +80,13 @@ predict_boots <- function(workflow,
       preds,
       dplyr::starts_with(".pred_"),
       names_to = "model",
-      values_to = ".pred"
+      values_to = "model.pred"
     )
 
   preds <-
     tidyr::nest(
       preds,
-      .preds = c(model, .pred)
+      .preds = c(model, model.pred)
     )
 
   return(preds)
@@ -134,6 +140,10 @@ summarise_predictions <- function(.data,
                                   conf = 0.95,
                                   summary_type = "quantile") {
 
+  # check arguments
+  assert_summary_data(.data)
+  assert_conf(conf)
+
   # internal renaming
   pred_summary <- .data
 
@@ -141,13 +151,16 @@ summarise_predictions <- function(.data,
   ci_lower <- (1 - conf)/2
   ci_upper <- ci_lower + conf
 
+  # return max row
+  n_rows <- nrow(pred_summary)
+
   # add interval - returns nested col
   if (summary_type == "quantile") {
 
     pred_summary <-
       dplyr::mutate(
         pred_summary,
-        interval = purrr::map(pred_summary$.preds, ~stats::quantile(.x$.pred, probs = c(ci_lower, 0.5, ci_upper)))
+        interval = purrr::map(pred_summary$.preds, ~stats::quantile(.x$model.pred, probs = c(ci_lower, 0.5, ci_upper)))
       )
 
   } else {
@@ -162,7 +175,7 @@ summarise_predictions <- function(.data,
   pred_summary <-
     dplyr::mutate(
       pred_summary,
-      pred_level = rep(c(".pred_lower", ".pred", ".pred_upper"), max(pred_summary$rowid))
+      pred_level = rep(c(".pred_lower", ".pred", ".pred_upper"), n_rows)
     )
 
   pred_summary <-

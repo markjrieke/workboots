@@ -49,6 +49,11 @@ vi_boots <- function(workflow,
                      training_data,
                      ...) {
 
+  # check arguments
+  assert_workflow(workflow)
+  assert_n(n)
+  assert_pred_data(workflow, training_data)
+
   # create resamples from training set
   training_boots <-
     rsample::bootstraps(
@@ -106,7 +111,7 @@ vi_single_boot <- function(workflow,
   model <- generics::fit(workflow, boot_train)
 
   # get the variable importance from the model
-  vi_boot <- vip::vi(workflows::pull_workflow_fit(model))
+  vi_boot <- vip::vi(workflows::extract_fit_engine(model))
 
   return(vi_boot)
 

@@ -3,5 +3,6 @@ globalVariables(c(
   "interval",
   "model",
   "pred_level",
-  "variable"
+  "variable",
+  "model.pred"
 ))

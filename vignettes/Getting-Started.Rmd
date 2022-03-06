@@ -14,11 +14,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   warning = FALSE,
-  message = FALSE
+  message = FALSE,
+  fig.width = 5
 )
 
 ggplot2::theme_set(
-  ggplot2::theme_minimal() +
+  ggplot2::theme_minimal(base_size = 8) +
     ggplot2::theme(plot.title.position = "plot",
                    plot.background = ggplot2::element_rect(fill = "white", color = "white"))
 )
@@ -130,10 +131,10 @@ penguins_preds_boot %>%
              y = .pred,
              ymin = .pred_lower,
              ymax = .pred_upper)) +
-  geom_point() +
-  geom_errorbar(alpha = 0.5) +
   geom_abline(linetype = "dashed",
-              color = "gray") +
+              color = "gray") + 
+  geom_errorbar(alpha = 0.5) +
+  geom_point(alpha = 0.5) +
   labs(title = "XGBoost Model Prediction Intervals from Bootstrap Resampling",
        subtitle = "Error bars represent the 2.5/97.5% quantiles")
 ```
