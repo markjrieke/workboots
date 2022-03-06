@@ -114,7 +114,7 @@ penguins_preds_boot <-
 penguins_preds_boot
 ```
 
-From each set of nexted predictions, we can summarise with a lower and upper bound of our prediction interval (this uses the [`quantile()`](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/quantile) function under the hood). 
+From each set of nested predictions, we can summarize with a lower and upper bound of our prediction interval (this uses the [`quantile()`](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/quantile) function under the hood). 
 
 ```{r}
 penguins_preds_boot %>%
