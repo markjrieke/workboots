@@ -111,7 +111,7 @@ vi_single_boot <- function(workflow,
   model <- generics::fit(workflow, boot_train)
 
   # get the variable importance from the model
-  vi_boot <- vip::vi(workflows::pull_workflow_fit(model))
+  vi_boot <- vip::vi(workflows::extract_fit_engine(model))
 
   return(vi_boot)
 
