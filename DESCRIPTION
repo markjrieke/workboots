@@ -1,5 +1,5 @@
 Package: workboots
-Title: Generate Bootstrap Prediction Intervals from a 'tidymodels' Workflow!
+Title: Generate Bootstrap Prediction Intervals from a 'tidymodels' Workflow
 Version: 0.1.0
 Authors@R:
     person(given = "Mark",
@@ -11,7 +11,7 @@ Description: Provides functions for generating bootstrap prediction
     <https://www.tidymodels.org/> is a collection of packages for modeling
     and machine learning using 'tidyverse' <https://www.tidyverse.org/>
     principles. This package is not affiliated with or maintained by
-    RStudio or the tidymodels maintainers.
+    'RStudio' or the 'tidymodels' maintainers.
 License: MIT + file LICENSE
 URL: https://github.com/markjrieke/workboots
 BugReports: https://github.com/markjrieke/workboots/issues
