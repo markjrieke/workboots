@@ -223,11 +223,18 @@ predict_single_boot <- function(workflow,
   # predict given model and new data
   preds <- stats::predict(model, new_data)
 
-  # get model residuals
-  resids <- stats::resid(workflows::extract_fit_engine(model))
+  # get predicted var name
+  pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
+  pred_name <- dplyr::pull(pred_name, variable)
+
+  # get actual dependent values
+  actuals <- dplyr::pull(boot_train, rlang::sym(pred_name))
+
+  # get resids
+  resids <- dplyr::pull(stats::predict(model, boot_train), .pred) - actuals
 
   # add resid sample to each prediction
-  preds <- tibble::add_column(preds, resid_sample = sample(resids, nrow(new_data)))
+  preds <- tibble::add_column(preds, resid_sample = sample(resids, nrow(new_data), replace = TRUE))
   preds <- dplyr::mutate(preds, .pred = .pred + resid_sample)
   preds <- preds[, 1]
 
@@ -237,3 +244,5 @@ predict_single_boot <- function(workflow,
   return(preds)
 
 }
+
+
