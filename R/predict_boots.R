@@ -201,6 +201,8 @@ summarise_predictions <- function(.data,
 #' @importFrom rsample training
 #' @importFrom generics fit
 #' @importFrom stats predict
+#' @importFrom stats resid
+#' @importFrom workflows extract_fit_engine
 #' @importFrom dplyr rename
 #' @importFrom rlang sym
 #'
@@ -220,6 +222,14 @@ predict_single_boot <- function(workflow,
 
   # predict given model and new data
   preds <- stats::predict(model, new_data)
+
+  # get model residuals
+  resids <- stats::resid(workflows::extract_fit_engine(model))
+
+  # add resid sample to each prediction
+  preds <- tibble::add_column(preds, resid_sample = sample(resids, nrow(new_data)))
+  preds <- dplyr::mutate(preds, .pred = .pred + resid_sample)
+  preds <- preds[, 1]
 
   # rename .pred col based on index number
   preds <- dplyr::rename(preds, !!rlang::sym(paste0(".pred_", index)) := .pred)
