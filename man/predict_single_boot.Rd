@@ -2,19 +2,23 @@
 % Please edit documentation in R/predict_boots.R
 \name{predict_single_boot}
 \alias{predict_single_boot}
-\title{Fit a model and predict based on a single bootstrap resample}
+\title{(Internal) Generate a column of predictions on new data based on a model fit
+to a single training bootstrap.}
 \usage{
-predict_single_boot(workflow, boot_splits, new_data, index)
+predict_single_boot(workflow, boot_splits, new_data, normal_resid, index)
 }
 \arguments{
-\item{workflow}{An un-fitted workflow object.}
+\item{workflow}{passed from \code{predict_boots()}}
 
-\item{boot_splits}{A bootstrap split object created by \code{rsample::bootstraps()}.}
+\item{boot_splits}{passed from \code{predict_boots()}}
 
-\item{new_data}{New data to make predictions}
+\item{new_data}{passed from \code{predict_boots()}}
 
-\item{index}{Index of \code{boot_splits} to use for training}
+\item{normal_resid}{passed from \code{predict_boots()}}
+
+\item{index}{passed from \code{predict_boots()}}
 }
 \description{
-Fit a model and predict based on a single bootstrap resample
+(Internal) Generate a column of predictions on new data based on a model fit
+to a single training bootstrap.
 }

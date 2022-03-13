@@ -13,16 +13,19 @@
 #'  `new_data` and a nested list of the model predictions for each observation.
 #'
 #' @param new_data A tibble or dataframe used to make predictions.
+#' @param normal_resid A logical. If set to `TRUE`, residuals are drawn from a
+#'  normal distribution centered at 0.  If set to `FALSE`, residuals are sampled
+#'  from each fit's actual distribution of residuals.
 #' @inheritParams vi_boots
 #'
 #' @export
 #'
+#' @importFrom rlang warn
 #' @importFrom rsample bootstraps
+#' @importFrom purrr map_dfc
 #' @importFrom tibble rowid_to_column
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr nest
-#' @importFrom purrr map_dfc
-#' @importFrom rlang :=
 #'
 #' @examples
 #' \dontrun{
@@ -40,9 +43,10 @@
 #'   predict_boots(n = 125, training_data = mtcars, new_data = mtcars)
 #' }
 predict_boots <- function(workflow,
-                          n = 100,
+                          n = 2000,
                           training_data,
                           new_data,
+                          normal_resid = TRUE,
                           ...) {
 
   # check arguments
@@ -50,6 +54,15 @@ predict_boots <- function(workflow,
   assert_n(n)
   assert_pred_data(workflow, training_data)
   assert_pred_data(workflow, new_data)
+
+  # warn if low n
+  if (n < 2000) {
+
+    rlang::warn(
+      paste0("At least 2000 resamples recommended for stable results.")
+    )
+
+  }
 
   # create resamples from training set
   training_boots <-
@@ -68,6 +81,7 @@ predict_boots <- function(workflow,
         workflow = workflow,
         boot_splits = training_boots,
         new_data = new_data,
+        normal_resid = normal_resid,
         index = .x
       )
     )
@@ -191,24 +205,31 @@ summarise_predictions <- function(.data,
 
 # --------------------------------internals-------------------------------------
 
-#' Fit a model and predict based on a single bootstrap resample
+#' (Internal) Generate a column of predictions on new data based on a model fit
+#' to a single training bootstrap.
 #'
-#' @param workflow An un-fitted workflow object.
-#' @param boot_splits A bootstrap split object created by `rsample::bootstraps()`.
-#' @param new_data New data to make predictions
-#' @param index Index of `boot_splits` to use for training
+#' @param workflow passed from `predict_boots()`
+#' @param boot_splits passed from `predict_boots()`
+#' @param new_data passed from `predict_boots()`
+#' @param normal_resid passed from `predict_boots()`
+#' @param index passed from `predict_boots()`
 #'
 #' @importFrom rsample training
 #' @importFrom generics fit
 #' @importFrom stats predict
-#' @importFrom stats resid
-#' @importFrom workflows extract_fit_engine
-#' @importFrom dplyr rename
+#' @importFrom dplyr filter
+#' @importFrom dplyr pull
 #' @importFrom rlang sym
+#' @importFrom stats sd
+#' @importFrom tibble add_column
+#' @importFrom stats rnorm
+#' @importFrom dplyr mutate
+#' @importFrom rlang :=
 #'
 predict_single_boot <- function(workflow,
                                 boot_splits,
                                 new_data,
+                                normal_resid,
                                 index) {
 
   # get training data from bootstrap resample split
@@ -230,12 +251,24 @@ predict_single_boot <- function(workflow,
   # get actual dependent values
   actuals <- dplyr::pull(boot_train, rlang::sym(pred_name))
 
-  # get resids
-  resids <- dplyr::pull(stats::predict(model, boot_train), .pred) - actuals
+  # get residuals (center at 0)
+  resids <- actuals - dplyr::pull(stats::predict(model, boot_train), .pred)
+  resids <- resids - mean(resids)
 
   # add resid sample to each prediction
-  preds <- tibble::add_column(preds, resid_sample = sample(resids, nrow(new_data), replace = TRUE))
-  preds <- dplyr::mutate(preds, .pred = .pred + resid_sample)
+  if (normal_resid == TRUE) {
+
+    std_dev <- stats::sd(resids)
+    preds <- tibble::add_column(preds, resid_add = stats::rnorm(nrow(new_data), 0, std_dev))
+
+  } else {
+
+    preds <- tibble::add_column(preds, resid_add = sample(resids, nrow(new_data), replace = TRUE))
+
+  }
+
+  # add residuals to fit
+  preds <- dplyr::mutate(preds, .pred = .pred + resid_add)
   preds <- preds[, 1]
 
   # rename .pred col based on index number
