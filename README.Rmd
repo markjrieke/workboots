@@ -17,6 +17,9 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/markjrieke/workboots/workflows/R-CMD-check/badge.svg)](https://github.com/markjrieke/workboots/actions)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN status](https://www.r-pkg.org/badges/version/workboots)](https://CRAN.R-project.org/package=workboots)
+[![Codecov test coverage](https://codecov.io/gh/markjrieke/workboots/branch/main/graph/badge.svg)](https://app.codecov.io/gh/markjrieke/workboots?branch=main)
 <!-- badges: end -->
 
 ### Overview
@@ -27,9 +30,13 @@ By using [bootstrap resampling](https://en.wikipedia.org/wiki/Bootstrapping_(sta
 
 ### Installation
 
-Currently, this package lives exclusively on github, though work is in progress to publish to CRAN. You can install the development version with the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) package:
+You can install the released version of `{workboots}` from CRAN or the development version from github with the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) package:
 
 ```{r, eval = FALSE}
+# install from CRAN
+install.packages("workboots")
+
+# or the development version
 devtools::install_github("markjrieke/workboots")
 ```
 
@@ -61,20 +68,32 @@ penguins_wf <-
 
 XGBoost can only generate point predictions, but with `{workboots}` we can train many models to generate many predictions and create a summary with lower and upper bounds:
 
-```{r}
+```{r, eval=FALSE}
 library(workboots)
 
+# generate predictions from 2000 bootstrap models
+set.seed(345)
 penguins_preds <-
   penguins_wf %>%
   predict_boots(
-    n = 100,
+    n = 2000,
     training_data = penguins_train,
     new_data = penguins_test
   )
 
+# summarise predictions with an upper & lower bound
 penguins_preds %>%
   summarise_predictions()
 ```
+
+```{r,echo=FALSE}
+library(workboots)
+
+# load data from sysdata.rda (avoid re-fitting on knit)
+workboots:::penguins_preds %>%
+  summarise_predictions()
+```
+
 
 ### Bug reports/feature requests 
 

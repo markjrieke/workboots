@@ -8,6 +8,12 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/markjrieke/workboots/workflows/R-CMD-check/badge.svg)](https://github.com/markjrieke/workboots/actions)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/workboots)](https://CRAN.R-project.org/package=workboots)
+[![Codecov test
+coverage](https://codecov.io/gh/markjrieke/workboots/branch/main/graph/badge.svg)](https://app.codecov.io/gh/markjrieke/workboots?branch=main)
 <!-- badges: end -->
 
 ### Overview
@@ -25,12 +31,16 @@ return point predictions.
 
 ### Installation
 
-Currently, this package lives exclusively on github, though work is in
-progress to publish to CRAN. You can install the development version
-with the [devtools](https://cran.r-project.org/package=devtools) or
+You can install the released version of `{workboots}` from CRAN or the
+development version from github with the
+[devtools](https://cran.r-project.org/package=devtools) or
 [remotes](https://cran.r-project.org/package=remotes) package:
 
 ``` r
+# install from CRAN
+install.packages("workboots")
+
+# or the development version
 devtools::install_github("markjrieke/workboots")
 ```
 
@@ -70,31 +80,34 @@ with lower and upper bounds:
 ``` r
 library(workboots)
 
+# generate predictions from 2000 bootstrap models
+set.seed(345)
 penguins_preds <-
   penguins_wf %>%
   predict_boots(
-    n = 100,
+    n = 2000,
     training_data = penguins_train,
     new_data = penguins_test
   )
 
+# summarise predictions with an upper & lower bound
 penguins_preds %>%
   summarise_predictions()
 ```
 
     ## # A tibble: 84 x 5
-    ##    rowid .preds             .pred_lower .pred .pred_upper
-    ##    <int> <list>                   <dbl> <dbl>       <dbl>
-    ##  1     1 <tibble [100 x 2]>       3308. 3456.       3596.
-    ##  2     2 <tibble [100 x 2]>       3334. 3535.       3778.
-    ##  3     3 <tibble [100 x 2]>       3307. 3596.       3822.
-    ##  4     4 <tibble [100 x 2]>       3781. 4139.       4499.
-    ##  5     5 <tibble [100 x 2]>       3638. 3854.       4082.
-    ##  6     6 <tibble [100 x 2]>       3300. 3493.       3762.
-    ##  7     7 <tibble [100 x 2]>       3276. 3432.       3570.
-    ##  8     8 <tibble [100 x 2]>       3758. 4036.       4358.
-    ##  9     9 <tibble [100 x 2]>       3276. 3452.       3614.
-    ## 10    10 <tibble [100 x 2]>       3254. 3407.       3648.
+    ##    rowid .preds               .pred_lower .pred .pred_upper
+    ##    <int> <list>                     <dbl> <dbl>       <dbl>
+    ##  1     1 <tibble [2,000 x 2]>       3130. 3446.       3712.
+    ##  2     2 <tibble [2,000 x 2]>       3194. 3510.       3829.
+    ##  3     3 <tibble [2,000 x 2]>       3208. 3587.       3942.
+    ##  4     4 <tibble [2,000 x 2]>       3658. 4137.       4515.
+    ##  5     5 <tibble [2,000 x 2]>       3538. 3840.       4137.
+    ##  6     6 <tibble [2,000 x 2]>       3140. 3484.       3789.
+    ##  7     7 <tibble [2,000 x 2]>       3129. 3417.       3668.
+    ##  8     8 <tibble [2,000 x 2]>       3653. 4050.       4400.
+    ##  9     9 <tibble [2,000 x 2]>       3092. 3424.       3666.
+    ## 10    10 <tibble [2,000 x 2]>       3062. 3380.       3664.
     ## # ... with 74 more rows
 
 ### Bug reports/feature requests
