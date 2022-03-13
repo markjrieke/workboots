@@ -4,7 +4,14 @@
 \alias{predict_boots}
 \title{Fit and predict from a workflow using many bootstrap resamples.}
 \usage{
-predict_boots(workflow, n = 100, training_data, new_data, ...)
+predict_boots(
+  workflow,
+  n = 2000,
+  training_data,
+  new_data,
+  normal_resid = TRUE,
+  ...
+)
 }
 \arguments{
 \item{workflow}{An un-fitted workflow object.}
@@ -14,6 +21,10 @@ predict_boots(workflow, n = 100, training_data, new_data, ...)
 \item{training_data}{A tibble or dataframe of data to be resampled and used for training.}
 
 \item{new_data}{A tibble or dataframe used to make predictions.}
+
+\item{normal_resid}{A logical. If set to \code{TRUE}, residuals are drawn from a
+normal distribution centered at 0.  If set to \code{FALSE}, residuals are sampled
+from each fit's actual distribution of residuals.}
 
 \item{...}{Additional params passed to \code{rsample::bootstraps()}.}
 }

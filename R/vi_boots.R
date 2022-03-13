@@ -45,7 +45,7 @@
 #'   vi_boots(n = 125, training_data = mtcars)
 #' }
 vi_boots <- function(workflow,
-                     n = 100,
+                     n = 2000,
                      training_data,
                      ...) {
 
@@ -53,6 +53,15 @@ vi_boots <- function(workflow,
   assert_workflow(workflow)
   assert_n(n)
   assert_pred_data(workflow, training_data)
+
+  # warn if low n
+  if (n < 2000) {
+
+    rlang::warn(
+      paste0("At least 2000 resamples recommended for stable results.")
+    )
+
+  }
 
   # create resamples from training set
   training_boots <-

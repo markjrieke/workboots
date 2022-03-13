@@ -25,7 +25,7 @@ ggplot2::theme_set(
 )
 ```
 
-When creating models, the range of expected outcomes is often just as important as the most likely outcome. For example, a prediction that a house will have a price of \$250,000 +/- \$10,000 has a vastly different interpretation than a prediction that a house will have a price of \$250,000 +/- \$50,000! Some models (like linear models) can output both point predictions and confidence intervals (*N.B. this is actually different than a prediction interval*) around each prediction but other --- often more powerful --- models can only output point predictions. 
+When creating models, the range of expected outcomes is often just as important as the most likely outcome. For example, a prediction that a house will have a price of \$250,000 +/- \$10,000 has a vastly different interpretation than a prediction that a house will have a price of \$250,000 +/- \$50,000! Some models (like linear models) can output both point predictions and prediction intervals but other --- often more powerful --- models can only output point predictions. 
 
 This is where [bootstrap resampling](https://rsample.tidymodels.org/reference/bootstraps.html) can help! Creating `n` resamples of the original dataset allows us to create `n` models --- one for each resample. These many models can then be used to predict on new data and create a distribution of expected outcomes for each prediction. 
 
@@ -98,21 +98,30 @@ penguins_preds %>%
 
 With `{workboots}`, however, we can generate a prediction distribution for each penguin's weight in the test set! To do so, we'll pass our workflow to `predict_boots()`, which will return a nested tibble with a set of predictions for each penguin in the `penguins_test` set. 
 
-```{r}
+```{r, eval=FALSE}
 library(workboots)
 
-# create 100 models from bootstrap resamples and make predictions on the test set
+# create 2000 models from bootstrap resamples and make predictions on the test set
 set.seed(345)
 penguins_preds_boot <- 
   penguins_wf %>%
   predict_boots(
-    n = 100,
+    n = 2000,
     training_data = penguins_train,
     new_data = penguins_test
   )
 
 penguins_preds_boot
 ```
+
+```{r, echo=FALSE}
+library(workboots)
+
+# load data from workboots_support (avoid re-fitting on knit)
+penguins_preds_boot <-readr::read_rds("https://github.com/markjrieke/workboots_support/blob/main/data/penguins_preds.rds?raw=true") 
+penguins_preds_boot
+```
+
 
 From each set of nested predictions, we can summarize with a lower and upper bound of our prediction interval (this uses the [`quantile()`](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/quantile) function under the hood). 
 
@@ -136,7 +145,8 @@ penguins_preds_boot %>%
   geom_errorbar(alpha = 0.5) +
   geom_point(alpha = 0.5) +
   labs(title = "XGBoost Model Prediction Intervals from Bootstrap Resampling",
-       subtitle = "Error bars represent the 2.5/97.5% quantiles")
+       subtitle = "Error bars represent the 95% prediction interval")
 ```
 
+Our XGBoost model is overfit to the training set --- in a more serious analysis we'd finalize tuning parameters prior to calling `predict_boots()`. 
 
