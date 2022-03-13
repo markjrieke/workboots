@@ -89,8 +89,10 @@ penguins_preds %>%
 ```{r,echo=FALSE}
 library(workboots)
 
-# load data from sysdata.rda (avoid re-fitting on knit)
-workboots:::penguins_preds %>%
+# load data from workboots_support (avoid re-fitting on knit)
+penguins_preds_boot <-readr::read_rds("https://github.com/markjrieke/workboots_support/blob/main/data/penguins_preds.rds?raw=true") 
+
+penguins_preds_boot %>%
   summarise_predictions()
 ```
 
