@@ -219,6 +219,7 @@ summarise_predictions <- function(.data,
 #' @importFrom stats predict
 #' @importFrom dplyr filter
 #' @importFrom dplyr pull
+#' @importFrom rsample testing
 #' @importFrom rlang sym
 #' @importFrom stats sd
 #' @importFrom tibble add_column
@@ -248,11 +249,17 @@ predict_single_boot <- function(workflow,
   pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
   pred_name <- dplyr::pull(pred_name, variable)
 
-  # get actual dependent values
-  actuals <- dplyr::pull(boot_train, rlang::sym(pred_name))
+  # get oob sample
+  boot_oob <-
+    rsample::testing(
+      boot_splits$splits[[index]]
+    )
 
-  # get residuals (center at 0)
-  resids <- actuals - dplyr::pull(stats::predict(model, boot_train), .pred)
+  # get actual dependent vals
+  actuals <- dplyr::pull(boot_oob, rlang::sym(pred_name))
+
+  # get residuals & center at 0
+  resids <- actuals - dplyr::pull(stats::predict(model, boot_oob), .pred)
   resids <- resids - mean(resids)
 
   # add resid sample to each prediction
