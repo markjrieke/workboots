@@ -4,6 +4,7 @@
   + updated function to generate prediction interval (previously was generating a prediction's confidence interval)
   + updated default setting to assume residuals are normally distributed (can draw from the actual residual distribution by setting `normal_resid = TRUE`)
   + updated default number of resamples
+  + updated function to draw residuals from the out-of-bag (OOB) distribution (previously was using training residuals)
 * updated default number of resamples in `vi_boots()`
 
 # workboots 0.1.0
