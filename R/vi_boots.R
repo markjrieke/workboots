@@ -52,7 +52,7 @@ vi_boots <- function(workflow,
   # check arguments
   assert_workflow(workflow)
   assert_n(n)
-  assert_pred_data(workflow, training_data)
+  assert_pred_data(workflow, training_data, "training")
 
   # warn if low n
   if (n < 2000) {
