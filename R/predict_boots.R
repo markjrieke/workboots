@@ -52,8 +52,8 @@ predict_boots <- function(workflow,
   # check arguments
   assert_workflow(workflow)
   assert_n(n)
-  assert_pred_data(workflow, training_data)
-  assert_pred_data(workflow, new_data)
+  assert_pred_data(workflow, training_data, "training")
+  assert_pred_data(workflow, new_data, "new")
 
   # warn if low n
   if (n < 2000) {

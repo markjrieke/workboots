@@ -10,13 +10,17 @@ test_test <- read.csv("data/test_test.csv")
 test_that("predict_boots() returns predictions in expected format", {
 
   # generate predictions
-  x <-
-    predict_boots(
-      workflow = test_wf,
-      n = 5,
-      training_data = test_train,
-      new_data = test_test
-    )
+  expect_warning(
+    x <-
+      predict_boots(
+        workflow = test_wf,
+        n = 5,
+        training_data = test_train,
+        new_data = test_test
+      ),
+
+    "At least 2000 resamples recommended for stable results."
+  )
 
   # tests
   expect_s3_class(x, c("tbl_df", "tbl", "data.frame"))
@@ -91,31 +95,30 @@ test_that("predict_boots() throws an error when bad n is specified", {
 
 test_that("predict_boots() throws an error when training_data/new_data doesn't match expected format", {
 
-  # load bad dataset (mtcars)
-  test_data_bad <- read.csv("data/test_data_bad.csv")
-
+  # predictors & outcome missing from training_data
   expect_error(
     predict_boots(
       workflow = test_wf,
       n = 1,
-      training_data = test_data_bad,
+      training_data = test_train[, 3],
       new_data = test_test
     ),
 
-    paste0("missing cols in training_data or new_data.\n",
-           "All predictors used in workflow must be present.")
+    paste0("missing cols in training_data:\n",
+           "species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, sex, body_mass_g")
   )
 
+  # predictors missing from new_data
   expect_error(
     predict_boots(
       workflow = test_wf,
       n = 1,
       training_data = test_train,
-      new_data = test_data_bad
+      new_data = test_test[, 3]
     ),
 
-    paste0("missing cols in training_data or new_data.\n",
-           "All predictors used in workflow must be present.")
+    paste0("missing cols in new_data:\n",
+           "species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, sex")
   )
 
 })
