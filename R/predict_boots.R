@@ -239,42 +239,64 @@ predict_single_boot <- function(workflow,
       boot_splits$splits[[index]]
     )
 
-  # fit workflow to training data
-  model <- generics::fit(workflow, boot_train)
-
-  # predict given model and new data
-  preds <- stats::predict(model, new_data)
-
-  # get predicted var name
-  pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
-  pred_name <- dplyr::pull(pred_name, variable)
-
   # get oob sample
   boot_oob <-
     rsample::testing(
       boot_splits$splits[[index]]
     )
 
-  # get actual dependent vals
-  actuals <- dplyr::pull(boot_oob, rlang::sym(pred_name))
+  # fit workflow to training data
+  model <- generics::fit(workflow, boot_train)
 
-  # get residuals & center at 0
-  resids <- actuals - dplyr::pull(stats::predict(model, boot_oob), .pred)
-  resids <- resids - mean(resids)
+  # get predicted var name
+  pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
+  pred_name <- dplyr::pull(pred_name, variable)
+
+  # get training residuals
+  preds_train <- dplyr::pull(stats::predict(model, boot_train), .pred)
+  actuals_train <- dplyr::pull(boot_train, rlang::sym(pred_name))
+  resids_train <- actuals_train - preds_train
+  resids_train <- resids_train - mean(resids_train)
+
+  # get oob residuals
+  preds_oob <- dplyr::pull(stats::predict(model, boot_oob), .pred)
+  actuals_oob <- dplyr::pull(boot_oob, rlang::sym(pred_name))
+  resids_oob <- actuals_oob - preds_oob
+  resids_oob <- resids_oob - mean(resids_oob)
+
+  # calculate no-information error rate (rmse_ni) with RMSE as loss function
+  combos <- tidyr::crossing(actuals_train, preds_train)
+  rmse_ni <- Metrics::rmse(combos$actuals_train, combos$preds_train)
+
+  # calculate overfit rate
+  rmse_oob <- Metrics::rmse(actuals_oob, preds_oob)
+  rmse_train <- Metrics::rmse(actuals_train, preds_train)
+  overfit <- (rmse_oob - rmse_train)/(rmse_ni - rmse_train)
+
+  # calculate weight (if overfit = 0, weight = .632 & residual used will just be .632)
+  weight <- 0.632/(1 - (0.368 * overfit))
+
+  # predict given model and new data
+  preds <- stats::predict(model, new_data)
 
   # add resid sample to each prediction
   if (normal_resid == TRUE) {
 
-    std_dev <- stats::sd(resids)
-    preds <- tibble::add_column(preds, resid_add = stats::rnorm(nrow(new_data), 0, std_dev))
+    sd_oob <- stats::sd(resids_oob)
+    sd_train <- stats::sd(resids_train)
+
+    preds <- tibble::add_column(preds, resid_oob = stats::rnorm(nrow(new_data), 0, sd_oob))
+    preds <- tibble::add_column(preds, resid_train = stats::rnorm(nrow(new_data), 0, sd_train))
 
   } else {
 
-    preds <- tibble::add_column(preds, resid_add = sample(resids, nrow(new_data), replace = TRUE))
+    preds <- tibble::add_column(preds, resid_oob = sample(resids_oob, nrow(new_data), replace = TRUE))
+    preds <- tibble::add_column(preds, resid_train = sample(resids_train, nrow(new_data), replace = TRUE))
 
   }
 
   # add residuals to fit
+  preds <- dplyr::mutate(preds, resid_add = (1-weight) * resid_train + weight * resid_oob)
   preds <- dplyr::mutate(preds, .pred = .pred + resid_add)
   preds <- preds[, 1]
 
