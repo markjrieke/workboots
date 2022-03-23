@@ -20,10 +20,13 @@
 #' @param workflow An un-fitted workflow object.
 #' @param training_data A tibble or dataframe of data to be resampled and used for training.
 #' @param n An integer for the number of bootstrap resampled models that will be created.
+#' @param verbose A logical. Defaults to `FALSE`. If set to `TRUE`, prints progress
+#'   of training to console.
 #' @param ... Additional params passed to `rsample::bootstraps()`.
 #'
 #' @export
 #'
+#' @importFrom rlang warn
 #' @importFrom rsample bootstraps
 #' @importFrom purrr map_dfr
 #' @importFrom dplyr rename_with
@@ -47,6 +50,7 @@
 vi_boots <- function(workflow,
                      n = 2000,
                      training_data,
+                     verbose = FALSE,
                      ...) {
 
   # check arguments
@@ -79,6 +83,7 @@ vi_boots <- function(workflow,
       ~vi_single_boot(
         workflow = workflow,
         boot_splits = training_boots,
+        verbose = verbose,
         index = .x
       )
     )
@@ -97,17 +102,19 @@ vi_boots <- function(workflow,
 
 #' Fit a model and get the variable importance based on a single bootstrap resample
 #'
-#' @param workflow An un-fitted workflow object.
-#' @param boot_splits A bootstrap split object created by `rsample::bootstraps()`.
-#' @param index Index of `boot_splits` to use for training
+#' @param workflow passed from `vi_boots()`
+#' @param boot_splits passed from `vi_boots()`
+#' @param verbose passed from `vi_boots()`
+#' @param index passed from `vi_boots()`
 #'
 #' @importFrom rsample training
 #' @importFrom generics fit
 #' @importFrom vip vi
-#' @importFrom workflows pull_workflow_fit
+#' @importFrom workflows extract_fit_engine
 #'
 vi_single_boot <- function(workflow,
                            boot_splits,
+                           verbose,
                            index) {
 
   # get training data from bootstrap resample split
@@ -121,6 +128,13 @@ vi_single_boot <- function(workflow,
 
   # get the variable importance from the model
   vi_boot <- vip::vi(workflows::extract_fit_engine(model))
+
+  # print progress when verbose is set to TRUE
+  verbose_print(
+    verbose = verbose,
+    index = index,
+    total = nrow(boot_splits)
+  )
 
   return(vi_boot)
 

@@ -10,6 +10,7 @@ predict_boots(
   training_data,
   new_data,
   normal_resid = TRUE,
+  verbose = FALSE,
   ...
 )
 }
@@ -25,6 +26,9 @@ predict_boots(
 \item{normal_resid}{A logical. If set to \code{TRUE}, residuals are drawn from a
 normal distribution centered at 0.  If set to \code{FALSE}, residuals are sampled
 from each fit's actual distribution of residuals.}
+
+\item{verbose}{A logical. Defaults to \code{FALSE}. If set to \code{TRUE}, prints progress
+of training to console.}
 
 \item{...}{Additional params passed to \code{rsample::bootstraps()}.}
 }

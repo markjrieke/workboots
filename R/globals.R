@@ -5,6 +5,8 @@ globalVariables(c(
   "model.pred",
   "pred_level",
   "resid_add",
+  "resid_oob",
+  "resid_train",
   "role",
   "variable"
 ))
