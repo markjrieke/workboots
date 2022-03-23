@@ -4,14 +4,16 @@
 \alias{vi_single_boot}
 \title{Fit a model and get the variable importance based on a single bootstrap resample}
 \usage{
-vi_single_boot(workflow, boot_splits, index)
+vi_single_boot(workflow, boot_splits, verbose, index)
 }
 \arguments{
-\item{workflow}{An un-fitted workflow object.}
+\item{workflow}{passed from \code{vi_boots()}}
 
-\item{boot_splits}{A bootstrap split object created by \code{rsample::bootstraps()}.}
+\item{boot_splits}{passed from \code{vi_boots()}}
 
-\item{index}{Index of \code{boot_splits} to use for training}
+\item{verbose}{passed from \code{vi_boots()}}
+
+\item{index}{passed from \code{vi_boots()}}
 }
 \description{
 Fit a model and get the variable importance based on a single bootstrap resample

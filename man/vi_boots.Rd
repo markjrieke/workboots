@@ -4,7 +4,7 @@
 \alias{vi_boots}
 \title{Fit and estimate variable importance from a workflow using many bootstrap resamples.}
 \usage{
-vi_boots(workflow, n = 2000, training_data, ...)
+vi_boots(workflow, n = 2000, training_data, verbose = FALSE, ...)
 }
 \arguments{
 \item{workflow}{An un-fitted workflow object.}
@@ -12,6 +12,9 @@ vi_boots(workflow, n = 2000, training_data, ...)
 \item{n}{An integer for the number of bootstrap resampled models that will be created.}
 
 \item{training_data}{A tibble or dataframe of data to be resampled and used for training.}
+
+\item{verbose}{A logical. Defaults to \code{FALSE}. If set to \code{TRUE}, prints progress
+of training to console.}
 
 \item{...}{Additional params passed to \code{rsample::bootstraps()}.}
 }

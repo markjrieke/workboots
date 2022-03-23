@@ -19,6 +19,7 @@ Imports:
     assertthat,
     dplyr,
     generics,
+    Metrics,
     purrr,
     rlang,
     rsample,

@@ -47,6 +47,7 @@ predict_boots <- function(workflow,
                           training_data,
                           new_data,
                           normal_resid = TRUE,
+                          verbose = FALSE,
                           ...) {
 
   # check arguments
@@ -82,6 +83,7 @@ predict_boots <- function(workflow,
         boot_splits = training_boots,
         new_data = new_data,
         normal_resid = normal_resid,
+        verbose = verbose,
         index = .x
       )
     )
@@ -212,25 +214,30 @@ summarise_predictions <- function(.data,
 #' @param boot_splits passed from `predict_boots()`
 #' @param new_data passed from `predict_boots()`
 #' @param normal_resid passed from `predict_boots()`
+#' @param verbose passed from `predict_boots()`
 #' @param index passed from `predict_boots()`
 #'
 #' @importFrom rsample training
+#' @importFrom rsample testing
 #' @importFrom generics fit
-#' @importFrom stats predict
 #' @importFrom dplyr filter
 #' @importFrom dplyr pull
-#' @importFrom rsample testing
+#' @importFrom stats predict
 #' @importFrom rlang sym
+#' @importFrom tidyr crossing
+#' @importFrom Metrics rmse
 #' @importFrom stats sd
 #' @importFrom tibble add_column
 #' @importFrom stats rnorm
 #' @importFrom dplyr mutate
+#' @importFrom dplyr rename
 #' @importFrom rlang :=
 #'
 predict_single_boot <- function(workflow,
                                 boot_splits,
                                 new_data,
                                 normal_resid,
+                                verbose,
                                 index) {
 
   # get training data from bootstrap resample split
@@ -239,47 +246,75 @@ predict_single_boot <- function(workflow,
       boot_splits$splits[[index]]
     )
 
-  # fit workflow to training data
-  model <- generics::fit(workflow, boot_train)
-
-  # predict given model and new data
-  preds <- stats::predict(model, new_data)
-
-  # get predicted var name
-  pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
-  pred_name <- dplyr::pull(pred_name, variable)
-
   # get oob sample
   boot_oob <-
     rsample::testing(
       boot_splits$splits[[index]]
     )
 
-  # get actual dependent vals
-  actuals <- dplyr::pull(boot_oob, rlang::sym(pred_name))
+  # fit workflow to training data
+  model <- generics::fit(workflow, boot_train)
 
-  # get residuals & center at 0
-  resids <- actuals - dplyr::pull(stats::predict(model, boot_oob), .pred)
-  resids <- resids - mean(resids)
+  # get predicted var name
+  pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
+  pred_name <- dplyr::pull(pred_name, variable)
+
+  # get training residuals
+  preds_train <- dplyr::pull(stats::predict(model, boot_train), .pred)
+  actuals_train <- dplyr::pull(boot_train, rlang::sym(pred_name))
+  resids_train <- actuals_train - preds_train
+  resids_train <- resids_train - mean(resids_train)
+
+  # get oob residuals
+  preds_oob <- dplyr::pull(stats::predict(model, boot_oob), .pred)
+  actuals_oob <- dplyr::pull(boot_oob, rlang::sym(pred_name))
+  resids_oob <- actuals_oob - preds_oob
+  resids_oob <- resids_oob - mean(resids_oob)
+
+  # calculate no-information error rate (rmse_ni) with RMSE as loss function
+  combos <- tidyr::crossing(actuals_train, preds_train)
+  rmse_ni <- Metrics::rmse(combos$actuals_train, combos$preds_train)
+
+  # calculate overfit rate
+  rmse_oob <- Metrics::rmse(actuals_oob, preds_oob)
+  rmse_train <- Metrics::rmse(actuals_train, preds_train)
+  overfit <- (rmse_oob - rmse_train)/(rmse_ni - rmse_train)
+
+  # calculate weight (if overfit = 0, weight = .632 & residual used will just be .632)
+  # uses the actual proportion of distinct training/oob samples, rather than average of 0.632/0.368
+  prop_368 <- nrow(boot_oob)/nrow(boot_train)
+  prop_632 <- 1 - prop_368
+  weight <- prop_632/(1 - (prop_368 * overfit))
+
+  # predict given model and new data
+  preds <- stats::predict(model, new_data)
 
   # add resid sample to each prediction
   if (normal_resid == TRUE) {
 
-    std_dev <- stats::sd(resids)
-    preds <- tibble::add_column(preds, resid_add = stats::rnorm(nrow(new_data), 0, std_dev))
+    sd_oob <- stats::sd(resids_oob)
+    sd_train <- stats::sd(resids_train)
+
+    preds <- tibble::add_column(preds, resid_oob = stats::rnorm(nrow(new_data), 0, sd_oob))
+    preds <- tibble::add_column(preds, resid_train = stats::rnorm(nrow(new_data), 0, sd_train))
 
   } else {
 
-    preds <- tibble::add_column(preds, resid_add = sample(resids, nrow(new_data), replace = TRUE))
+    preds <- tibble::add_column(preds, resid_oob = sample(resids_oob, nrow(new_data), replace = TRUE))
+    preds <- tibble::add_column(preds, resid_train = sample(resids_train, nrow(new_data), replace = TRUE))
 
   }
 
   # add residuals to fit
+  preds <- dplyr::mutate(preds, resid_add = (1-weight) * resid_train + weight * resid_oob)
   preds <- dplyr::mutate(preds, .pred = .pred + resid_add)
   preds <- preds[, 1]
 
   # rename .pred col based on index number
   preds <- dplyr::rename(preds, !!rlang::sym(paste0(".pred_", index)) := .pred)
+
+  # print progress when verbose is set to TRUE
+  verbose_print(verbose, index, nrow(boot_splits))
 
   return(preds)
 
