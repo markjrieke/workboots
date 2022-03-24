@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-## workboots
+# workboots <img src="man/figures/logo.png" align="right" width="120" />
 
 **Author:** [Mark Rieke](https://www.thedatadiary.net/about/) <br/>
 **License:** [MIT](https://github.com/markjrieke/workboots/blob/main/LICENSE)
@@ -22,13 +22,13 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/markjrieke/workboots/branch/main/graph/badge.svg)](https://app.codecov.io/gh/markjrieke/workboots?branch=main)
 <!-- badges: end -->
 
-### Overview
+## Overview
 
 `{workboots}` is a tidy method of generating bootstrap prediction intervals for arbitrary model types from a tidymodel workflow. 
 
 By using [bootstrap resampling](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)), we can create many models --- one for each resample. Each model will be slightly different based on the resample it was trained on. Each model will also generate slightly different predictions for new data, allowing us to generate a prediction distribution for models that otherwise just return point predictions.
 
-### Installation
+## Installation
 
 You can install the released version of `{workboots}` from CRAN or the development version from github with the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) package:
 
@@ -40,7 +40,7 @@ install.packages("workboots")
 devtools::install_github("markjrieke/workboots")
 ```
 
-### Usage
+## Usage
 
 `{workboots}` builds on top of the [`{tidymodels}`](https://www.tidymodels.org/) suite of packages. Teaching how to use `{tidymodels}` is beyond the scope of this package, but some helpful resources are linked at the bottom of this README. 
 
@@ -97,7 +97,7 @@ penguins_preds_boot %>%
 ```
 
 
-### Bug reports/feature requests 
+## Bug reports/feature requests 
 
 This package is still in its infancy --- if you notice a bug, want to request a new feature, or have recommendations on improving documentation, please [open an issue](https://github.com/markjrieke/workboots/issues) in this repository.
 
