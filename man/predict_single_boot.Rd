@@ -5,14 +5,7 @@
 \title{(Internal) Generate a column of predictions on new data based on a model fit
 to a single training bootstrap.}
 \usage{
-predict_single_boot(
-  workflow,
-  boot_splits,
-  new_data,
-  normal_resid,
-  verbose,
-  index
-)
+predict_single_boot(workflow, boot_splits, new_data, verbose, index)
 }
 \arguments{
 \item{workflow}{passed from \code{predict_boots()}}
@@ -20,8 +13,6 @@ predict_single_boot(
 \item{boot_splits}{passed from \code{predict_boots()}}
 
 \item{new_data}{passed from \code{predict_boots()}}
-
-\item{normal_resid}{passed from \code{predict_boots()}}
 
 \item{verbose}{passed from \code{predict_boots()}}
 

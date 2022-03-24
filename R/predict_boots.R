@@ -13,9 +13,6 @@
 #'  `new_data` and a nested list of the model predictions for each observation.
 #'
 #' @param new_data A tibble or dataframe used to make predictions.
-#' @param normal_resid A logical. If set to `TRUE`, residuals are drawn from a
-#'  normal distribution centered at 0.  If set to `FALSE`, residuals are sampled
-#'  from each fit's actual distribution of residuals.
 #' @inheritParams vi_boots
 #'
 #' @export
@@ -46,7 +43,6 @@ predict_boots <- function(workflow,
                           n = 2000,
                           training_data,
                           new_data,
-                          normal_resid = TRUE,
                           verbose = FALSE,
                           ...) {
 
@@ -82,7 +78,6 @@ predict_boots <- function(workflow,
         workflow = workflow,
         boot_splits = training_boots,
         new_data = new_data,
-        normal_resid = normal_resid,
         verbose = verbose,
         index = .x
       )
@@ -213,7 +208,6 @@ summarise_predictions <- function(.data,
 #' @param workflow passed from `predict_boots()`
 #' @param boot_splits passed from `predict_boots()`
 #' @param new_data passed from `predict_boots()`
-#' @param normal_resid passed from `predict_boots()`
 #' @param verbose passed from `predict_boots()`
 #' @param index passed from `predict_boots()`
 #'
@@ -236,7 +230,6 @@ summarise_predictions <- function(.data,
 predict_single_boot <- function(workflow,
                                 boot_splits,
                                 new_data,
-                                normal_resid,
                                 verbose,
                                 index) {
 
@@ -286,27 +279,16 @@ predict_single_boot <- function(workflow,
   prop_632 <- 1 - prop_368
   weight <- prop_632/(1 - (prop_368 * overfit))
 
+  # determine residual std.dev based on weight
+  sd_oob <- stats::sd(resids_oob)
+  sd_train <- stats::sd(resids_train)
+  sd_resid <- weight * sd_oob + (1 - weight) * sd_train
+
   # predict given model and new data
   preds <- stats::predict(model, new_data)
 
-  # add resid sample to each prediction
-  if (normal_resid == TRUE) {
-
-    sd_oob <- stats::sd(resids_oob)
-    sd_train <- stats::sd(resids_train)
-
-    preds <- tibble::add_column(preds, resid_oob = stats::rnorm(nrow(new_data), 0, sd_oob))
-    preds <- tibble::add_column(preds, resid_train = stats::rnorm(nrow(new_data), 0, sd_train))
-
-  } else {
-
-    preds <- tibble::add_column(preds, resid_oob = sample(resids_oob, nrow(new_data), replace = TRUE))
-    preds <- tibble::add_column(preds, resid_train = sample(resids_train, nrow(new_data), replace = TRUE))
-
-  }
-
   # add residuals to fit
-  preds <- dplyr::mutate(preds, resid_add = (1-weight) * resid_train + weight * resid_oob)
+  preds <- tibble::add_column(preds, resid_add = stats::rnorm(nrow(new_data), 0, sd_resid))
   preds <- dplyr::mutate(preds, .pred = .pred + resid_add)
   preds <- preds[, 1]
 
