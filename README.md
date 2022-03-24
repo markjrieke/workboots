@@ -1,5 +1,5 @@
 
-## workboots
+# workboots <img src="man/figures/logo.png" align="right" width="120" />
 
 **Author:** [Mark Rieke](https://www.thedatadiary.net/about/) <br/>
 **License:**
@@ -16,7 +16,7 @@ status](https://www.r-pkg.org/badges/version/workboots)](https://CRAN.R-project.
 coverage](https://codecov.io/gh/markjrieke/workboots/branch/main/graph/badge.svg)](https://app.codecov.io/gh/markjrieke/workboots?branch=main)
 <!-- badges: end -->
 
-### Overview
+## Overview
 
 `{workboots}` is a tidy method of generating bootstrap prediction
 intervals for arbitrary model types from a tidymodel workflow.
@@ -29,7 +29,7 @@ will also generate slightly different predictions for new data, allowing
 us to generate a prediction distribution for models that otherwise just
 return point predictions.
 
-### Installation
+## Installation
 
 You can install the released version of `{workboots}` from CRAN or the
 development version from github with the
@@ -44,7 +44,7 @@ install.packages("workboots")
 devtools::install_github("markjrieke/workboots")
 ```
 
-### Usage
+## Usage
 
 `{workboots}` builds on top of the
 [`{tidymodels}`](https://www.tidymodels.org/) suite of packages.
@@ -98,19 +98,19 @@ penguins_preds %>%
     ## # A tibble: 84 x 5
     ##    rowid .preds               .pred_lower .pred .pred_upper
     ##    <int> <list>                     <dbl> <dbl>       <dbl>
-    ##  1     1 <tibble [2,000 x 2]>       2788. 3470.       4136.
-    ##  2     2 <tibble [2,000 x 2]>       2838. 3534.       4231.
-    ##  3     3 <tibble [2,000 x 2]>       2942. 3598.       4301.
-    ##  4     4 <tibble [2,000 x 2]>       3354. 4158.       4889.
-    ##  5     5 <tibble [2,000 x 2]>       3186. 3870.       4500.
-    ##  6     6 <tibble [2,000 x 2]>       2884. 3519.       4208.
-    ##  7     7 <tibble [2,000 x 2]>       2790. 3434.       4094.
-    ##  8     8 <tibble [2,000 x 2]>       3394. 4071.       4772.
-    ##  9     9 <tibble [2,000 x 2]>       2812. 3447.       4096.
-    ## 10    10 <tibble [2,000 x 2]>       2744. 3404.       4063.
+    ##  1     1 <tibble [2,000 x 2]>       3007. 3475.       3937.
+    ##  2     2 <tibble [2,000 x 2]>       3054. 3542.       4035.
+    ##  3     3 <tibble [2,000 x 2]>       3084. 3617.       4158.
+    ##  4     4 <tibble [2,000 x 2]>       3584. 4148.       4710.
+    ##  5     5 <tibble [2,000 x 2]>       3400. 3875.       4343.
+    ##  6     6 <tibble [2,000 x 2]>       3024. 3510.       4002.
+    ##  7     7 <tibble [2,000 x 2]>       2983. 3434.       3867.
+    ##  8     8 <tibble [2,000 x 2]>       3513. 4070.       4591.
+    ##  9     9 <tibble [2,000 x 2]>       2976. 3447.       3925.
+    ## 10    10 <tibble [2,000 x 2]>       2916. 3402.       3880.
     ## # ... with 74 more rows
 
-### Bug reports/feature requests
+## Bug reports/feature requests
 
 This package is still in its infancy — if you notice a bug, want to
 request a new feature, or have recommendations on improving
