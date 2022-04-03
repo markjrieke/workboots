@@ -93,3 +93,7 @@ summarise_predictions <- function(.data,
   return(pred_summary)
 
 }
+
+#' @describeIn summarise_boots
+#' @export
+summarize_boots <- summarise_boots
