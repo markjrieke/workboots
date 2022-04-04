@@ -93,7 +93,90 @@ summarise_predictions <- function(.data,
   return(pred_summary)
 
 }
-
-#' @describeIn summarise_boots
+#' @describeIn summarise_predictions
 #' @export
-summarize_boots <- summarise_boots
+summarize_predictions <- summarise_predictions
+
+summarise_importance <- function(.data,
+                                 conf = 0.95) {
+
+  summarise_generic(
+    .data = .data,
+    nest_col = "importance",
+    conf = conf
+  )
+
+}
+
+# ------------------------------internals---------------------------------------
+
+#' Function for generating generic summaries
+summarise_generic <- function(.data,
+                              nest_col,
+                              conf) {
+
+  # internal renaming
+  summary <- .data
+
+  # determine ci_lower & ci_upper values from conf
+  ci_lower <- (1 - conf)/2
+  ci_upper <- ci_lower + conf
+
+  # return max row
+  n_rows <- nrow(summary)
+
+  # map variable importances to quantile fn
+  if (nest_col == ".preds") {
+
+    # summarise predictions
+    summary <-
+      dplyr::mutate(
+        summary,
+        interval = purrr::map(summary$.preds, ~stats::quantile(.x$model.pred, probs = c(ci_lower, 0.5, ci_upper)))
+      )
+
+    # vector of lower/med/upper column names
+    col_vec <- rep(c(".pred_lower", ".pred", ".pred_upper"), n_rows)
+
+  } else {
+
+    # adjust the importance cols if needed
+    if (ncol(summary$.importances[[1]]) > 2) {
+
+      summary <- tidyr::unnest(summary, .importances)
+      summary <- dplyr::mutate(summary, model.importance = ifelse(sign == "NEG", -model.importance, model.importance))
+      summary <- dplyr::select(summary, -sign)
+      summary <- tidyr::nest(summary, .importances = -variable)
+
+    }
+
+    # summarise variable importances
+    summary <-
+      dplyr::mutate(
+        summary,
+        interval = purrr::map(summary$.importances, ~stats::quantile(.x$model.importance, probs = c(ci_lower, 0.5, ci_upper)))
+      )
+
+    # vector of lower/med/upper column names
+    col_vec <- rep(c(".importance_lower", ".importance", ".importance_upper"), n_rows)
+
+  }
+
+  # add interval labels & display as their own cols
+  summary <- tidyr::unnest(summary, interval)
+  summary <-
+    dplyr::mutate(
+      summary,
+      int_level = col_vec
+    )
+
+  summary <-
+    tidyr::pivot_wider(
+      summary,
+      names_from = int_level,
+      values_from = interval
+    )
+
+  return(summary)
+
+}
