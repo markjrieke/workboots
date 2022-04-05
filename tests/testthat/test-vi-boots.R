@@ -24,9 +24,9 @@ test_that("vi_boots() returns importances in expected format", {
 
   # tests
   expect_s3_class(x, c("tbl_df", "tbl", "data.frame"))
-  expect_named(x, c("variable", "importance"))
+  expect_named(x, c("variable", ".importances"))
   expect_type(x$variable, "character")
-  expect_type(x$importance, "list")
+  expect_type(x$.importances, "list")
 
 })
 
