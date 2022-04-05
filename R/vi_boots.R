@@ -90,9 +90,10 @@ vi_boots <- function(workflow,
 
   # rename cols
   bootstrap_vi <- dplyr::rename_with(bootstrap_vi, tolower)
+  bootstrap_vi <- dplyr::rename(bootstrap_vi, model.importance = importance)
 
   # return a nested tibble
-  bootstrap_vi <- tidyr::nest(bootstrap_vi, importance = -variable)
+  bootstrap_vi <- tidyr::nest(bootstrap_vi, .importances = -variable)
 
   return(bootstrap_vi)
 
@@ -128,6 +129,9 @@ vi_single_boot <- function(workflow,
 
   # get the variable importance from the model
   vi_boot <- vip::vi(workflows::extract_fit_engine(model))
+
+  # add model name
+  vi_boot <- dplyr::mutate(vi_boot, model = paste0(".importance_", index))
 
   # print progress when verbose is set to TRUE
   verbose_print(

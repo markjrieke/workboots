@@ -86,7 +86,7 @@ assert_pred_data <- function(workflow, data, type) {
 }
 
 # Util function for checking .data passed to summary functions
-assert_summary_data <- function(data) {
+assert_pred_summary <- function(data) {
 
   # check for col .preds
   assertthat::assert_that(
@@ -105,6 +105,29 @@ assert_summary_data <- function(data) {
   assertthat::assert_that(
     class(data$.preds[[1]]$model.pred) == "numeric",
     msg = "col `model.pred` must be numeric."
+  )
+
+}
+
+# Util function for checking .data passed to importance summary function
+assert_importance_summary <- function(data) {
+
+  # check for col .importances
+  assertthat::assert_that(
+    ".importances" %in% names(data),
+    msg = "col `.importances` missing."
+  )
+
+  # check that .importances is a list
+  assertthat::assert_that(
+    class(data$.importances) == "list",
+    msg = "col `.importances` must be a list-col."
+  )
+
+  # check that model.importance is numeric
+  assertthat::assert_that(
+    class(data$.importances[[1]]$model.importance) == "numeric",
+    msg = "col `model.importance` must be numeric."
   )
 
 }

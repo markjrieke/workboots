@@ -1,7 +1,11 @@
 globalVariables(c(
   ".pred",
+  ".importances",
+  "importance",
+  "int_level",
   "interval",
   "model",
+  "model.importance",
   "model.pred",
   "pred_level",
   "resid_add",
