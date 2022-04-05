@@ -39,7 +39,7 @@ summarise_predictions <- function(.data,
                                   conf = 0.95) {
 
   # check arguments
-  assert_summary_data(.data)
+  assert_pred_summary(.data)
   assert_conf(conf)
 
   # pass to summarise_generic
@@ -92,6 +92,11 @@ summarize_predictions <- summarise_predictions
 summarise_importance <- function(.data,
                                  conf = 0.95) {
 
+  # check arguments
+  assert_importance_summary(.data)
+  assert_conf(conf)
+
+  # pass arguments to summarise_generic
   summarise_generic(
     .data = .data,
     nest_col = "importance",
