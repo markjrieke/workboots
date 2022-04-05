@@ -50,7 +50,7 @@ summarise_predictions <- function(.data,
   )
 
 }
-#' @describeIn summarise_predictions
+#' @rdname summarise_predictions
 #' @export
 summarize_predictions <- summarise_predictions
 
@@ -104,7 +104,7 @@ summarise_importance <- function(.data,
   )
 
 }
-#' @describeIn summarise_importance
+#' @rdname summarise_importance
 #' @export
 summarize_importance <- summarise_importance
 
