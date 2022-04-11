@@ -5,6 +5,7 @@
 ^cran-comments\.md$
 ^data-raw$
 ^pkgdown$
+^revdep$
 ^_pkgdown\.yml$
 ^\.github$
 
