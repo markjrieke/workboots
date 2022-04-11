@@ -13,7 +13,7 @@
 #'  nested list of variable importances for each variable. The shape of the list
 #'  may vary by model type. For example, linear models return two nested columns:
 #'  the absolute value of each variable's importance and the sign (POS/NEG),
-#'  whereas XGboost models return a single nested column of variable importance.
+#'  whereas tree-based models return a single nested column of variable importance.
 #'  Similarly, the number of nested rows may vary by model type as some models
 #'  may not utilize every possible predictor.
 #'

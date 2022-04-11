@@ -1,4 +1,4 @@
-# workboots (development version)
+# workboots 0.1.1
 
 ### Function updates
 
@@ -9,6 +9,7 @@
   + updated function to draw residuals based on the [632+ rule](https://stats.stackexchange.com/questions/96739/what-is-the-632-rule-in-bootstrapping) (previously was using training residuals)
 * updated default number of resamples in `vi_boots()`
 * added param `verbose` to both `predict_boots()` and `vi_boots()` to display progress in the console. 
+* added new function `summarise_importance()`, as well alias `summarize_*` for `summarise_*`
 
 ### Bug fixes
 
