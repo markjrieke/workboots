@@ -1,10 +1,12 @@
+# workboots development version
+
 # workboots 0.1.1
 
 ### Function updates
 
 * Updates to `predict_boots()`
   + updated function to generate prediction interval (previously was generating a prediction's confidence interval)
-  + updated default setting to assume residuals are normally distributed (can draw from the actual residual distribution by setting `normal_resid = TRUE`)
+  + updated default setting to assume residuals are normally distributed
   + updated default number of resamples
   + updated function to draw residuals based on the [632+ rule](https://stats.stackexchange.com/questions/96739/what-is-the-632-rule-in-bootstrapping) (previously was using training residuals)
 * updated default number of resamples in `vi_boots()`
