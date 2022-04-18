@@ -28,10 +28,10 @@ Similarly, the number of nested rows may vary by model type as some models
 may not utilize every possible predictor.
 }
 \description{
-Generate a prediction interval from arbitrary model types using bootstrap
-resampling. \code{predict_boots()} generates \code{n} bootstrap resamples, fits a model
-to each resample (creating \code{n} models), then creates \code{n} estimates of variable
-importance for each variable in the model.
+Generate variable importances from a tidymodel workflow using bootstrap resampling.
+\code{vi_boots()} generates \code{n} bootstrp resamples, fits a model to each (creating
+\code{n} models), then creates \code{n} estimates of variable importance for each variable
+in the model.
 }
 \details{
 Since \code{vi_boots()} fits a new model to each resample, the
