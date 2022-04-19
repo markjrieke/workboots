@@ -12,6 +12,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/workboots)](https://CRAN.R-project.org/package=workboots)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/workboots)](https://cran.r-project.org/package=workboots)
 <!-- badges: end -->
 
 ## Overview
