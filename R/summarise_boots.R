@@ -125,6 +125,8 @@ summarize_importance <- summarise_importance
 #' @importFrom tidyr nest
 #' @importFrom tidyr pivot_wider
 #'
+#' @keywords internal
+#'
 summarise_generic <- function(.data,
                               nest_col,
                               conf) {
