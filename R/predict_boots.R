@@ -131,7 +131,7 @@ predict_boots <- function(workflow,
 #' @importFrom dplyr rename
 #' @importFrom rlang :=
 #'
-#' @keywords internal
+#' @noRd
 #'
 predict_single_boot <- function(workflow,
                                 boot_splits,

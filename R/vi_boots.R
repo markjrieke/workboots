@@ -113,7 +113,7 @@ vi_boots <- function(workflow,
 #' @importFrom vip vi
 #' @importFrom workflows extract_fit_engine
 #'
-#' @keywords internal
+#' @noRd
 #'
 vi_single_boot <- function(workflow,
                            boot_splits,
