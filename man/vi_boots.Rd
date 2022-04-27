@@ -51,6 +51,6 @@ wf <-
 # fit and estimate variable importance from 125 bootstrap resampled models
 set.seed(123)
 wf \%>\%
-  vi_boots(n = 125, training_data = mtcars)
+  vi_boots(n = 2000, training_data = mtcars)
 }
 }

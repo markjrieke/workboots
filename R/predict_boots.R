@@ -34,10 +34,10 @@
 #'   add_recipe(recipe(qsec ~ wt, data = mtcars)) %>%
 #'   add_model(linear_reg())
 #'
-#' # fit and predict 125 bootstrap resampled models to mtcars
+#' # fit and predict 2000 bootstrap resampled models to mtcars
 #' set.seed(123)
 #' wf %>%
-#'   predict_boots(n = 125, training_data = mtcars, new_data = mtcars)
+#'   predict_boots(n = 2000, training_data = mtcars, new_data = mtcars)
 #' }
 predict_boots <- function(workflow,
                           n = 2000,
