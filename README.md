@@ -94,20 +94,20 @@ penguins_preds %>%
   summarise_predictions()
 ```
 
-    ## # A tibble: 84 x 5
-    ##    rowid .preds               .pred_lower .pred .pred_upper
-    ##    <int> <list>                     <dbl> <dbl>       <dbl>
-    ##  1     1 <tibble [2,000 x 2]>       2913. 3465.       3994.
-    ##  2     2 <tibble [2,000 x 2]>       2982. 3535.       4100.
-    ##  3     3 <tibble [2,000 x 2]>       3050. 3604.       4187.
-    ##  4     4 <tibble [2,000 x 2]>       3477. 4157.       4764.
-    ##  5     5 <tibble [2,000 x 2]>       3305. 3868.       4372.
-    ##  6     6 <tibble [2,000 x 2]>       2996. 3519.       4078.
-    ##  7     7 <tibble [2,000 x 2]>       2914. 3435.       3954.
-    ##  8     8 <tibble [2,000 x 2]>       3483. 4072.       4653.
-    ##  9     9 <tibble [2,000 x 2]>       2926. 3445.       3966.
-    ## 10    10 <tibble [2,000 x 2]>       2876. 3405.       3938.
-    ## # ... with 74 more rows
+    #> # A tibble: 84 x 5
+    #>    rowid .preds               .pred_lower .pred .pred_upper
+    #>    <int> <list>                     <dbl> <dbl>       <dbl>
+    #>  1     1 <tibble [2,000 x 2]>       2913. 3465.       3994.
+    #>  2     2 <tibble [2,000 x 2]>       2982. 3535.       4100.
+    #>  3     3 <tibble [2,000 x 2]>       3050. 3604.       4187.
+    #>  4     4 <tibble [2,000 x 2]>       3477. 4157.       4764.
+    #>  5     5 <tibble [2,000 x 2]>       3305. 3868.       4372.
+    #>  6     6 <tibble [2,000 x 2]>       2996. 3519.       4078.
+    #>  7     7 <tibble [2,000 x 2]>       2914. 3435.       3954.
+    #>  8     8 <tibble [2,000 x 2]>       3483. 4072.       4653.
+    #>  9     9 <tibble [2,000 x 2]>       2926. 3445.       3966.
+    #> 10    10 <tibble [2,000 x 2]>       2876. 3405.       3938.
+    #> # ... with 74 more rows
 
 ## Bug reports/feature requests
 

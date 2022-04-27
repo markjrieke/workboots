@@ -12,12 +12,11 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   warning = FALSE,
-  message = FALSE,
-  fig.width = 5
+  message = FALSE
 )
 
 ggplot2::theme_set(
-  ggplot2::theme_minimal(base_size = 8) +
+  ggplot2::theme_minimal() +
     ggplot2::theme(plot.title.position = "plot",
                    plot.background = ggplot2::element_rect(fill = "white", color = "white"))
 )

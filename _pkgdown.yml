@@ -3,3 +3,7 @@ template:
   bootstrap: 5
   bootswatch: yeti
 
+figures:
+  fig.width: 8
+  fig.height: 5.75
+
