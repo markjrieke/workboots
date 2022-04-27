@@ -1,0 +1,5 @@
+url: https://markjrieke.github.io/workboots/
+template:
+  bootstrap: 5
+  bootswatch: yeti
+

@@ -13,7 +13,8 @@ Description: Provides functions for generating bootstrap prediction
     principles. This package is not affiliated with or maintained by
     'RStudio' or the 'tidymodels' maintainers.
 License: MIT + file LICENSE
-URL: https://github.com/markjrieke/workboots
+URL: https://github.com/markjrieke/workboots,
+    https://markjrieke.github.io/workboots/
 BugReports: https://github.com/markjrieke/workboots/issues
 Imports:
     assertthat,
