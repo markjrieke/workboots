@@ -124,6 +124,7 @@ summarize_importance <- summarise_importance
 #' @importFrom dplyr select
 #' @importFrom tidyr nest
 #' @importFrom tidyr pivot_wider
+#' @importFrom dplyr relocate
 #'
 #' @noRd
 #'
@@ -192,6 +193,17 @@ summarise_generic <- function(.data,
       names_from = int_level,
       values_from = interval
     )
+
+  # rearrange cols to be .mid .lower .upper
+  if (nest_col == ".preds") {
+
+    summary <- dplyr::relocate(summary, .pred_lower, .after = .pred)
+
+  } else {
+
+    summary <- dplyr::relocate(summary, .importance_lower, .after = .importance)
+
+  }
 
   return(summary)
 
