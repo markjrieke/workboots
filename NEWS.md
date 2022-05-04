@@ -1,4 +1,9 @@
-# workboots development version
+# workboots 0.2.0
+
+### Function updates
+
+* Rearranged column order output of `summarise_*` functions from `*_lower`, `*`, `*_upper` to `*`, `*_lower`, `*_upper`
+* Deprecated `conf` parameter in `summarise_*` functions in favor of `interval_width`
 
 # workboots 0.1.1
 

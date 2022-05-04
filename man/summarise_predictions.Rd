@@ -7,14 +7,16 @@
 \title{Append a tibble of predictions returned by \code{predict_boots()} with a prediction
 interval.}
 \usage{
-summarise_predictions(.data, conf = 0.95)
+summarise_predictions(.data, interval_width = 0.95, conf = NULL)
 
-summarize_predictions(.data, conf = 0.95)
+summarize_predictions(.data, interval_width = 0.95, conf = NULL)
 }
 \arguments{
 \item{.data}{a tibble of predictions returned by \code{predict_boots()}.}
 
-\item{conf}{a value between (0, 1) specifying the interval range.}
+\item{interval_width}{a value between (0, 1) specifying the interval range.}
+
+\item{conf}{deprecated - please use \code{interval_width} instead.}
 }
 \value{
 Appends the tibble of predictions returned by \code{predict_boots()} with

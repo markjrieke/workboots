@@ -11,9 +11,12 @@
 #' @aliases `summarize_predictions()`
 #'
 #' @param .data a tibble of predictions returned by `predict_boots()`.
-#' @param conf a value between (0, 1) specifying the interval range.
+#' @param interval_width a value between (0, 1) specifying the interval range.
+#' @param conf deprecated - please use `interval_width` instead.
 #'
 #' @export
+#'
+#' @importFrom lifecycle deprecate_soft
 #'
 #' @examples
 #' \dontrun{
@@ -36,17 +39,32 @@
 #'   summarise_predictions(conf = 0.95)
 #' }
 summarise_predictions <- function(.data,
-                                  conf = 0.95) {
+                                  interval_width = 0.95,
+                                  conf = NULL) {
+
+  # warn about parameter deprecation
+  if (!is.null(conf)) {
+
+    lifecycle::deprecate_soft(
+      when = "0.2.0",
+      what = "summarise_predictions(conf)",
+      with = "summarise_predictions(interval_width)"
+    )
+
+    # reassign to interval width
+    interval_width <- conf
+
+  }
 
   # check arguments
   assert_pred_summary(.data)
-  assert_conf(conf)
+  assert_interval(interval_width)
 
   # pass to summarise_generic
   summarise_generic(
     .data = .data,
     nest_col = ".preds",
-    conf = conf
+    interval_width = interval_width
   )
 
 }
@@ -65,9 +83,12 @@ summarize_predictions <- summarise_predictions
 #'  the lower, 50th percentile, and upper interval ranges.
 #'
 #' @param .data a tibble of variable importances returned by `vi_boots()`.
-#' @param conf a value between (0, 1) specifying the interval range.
+#' @param interval_width a value between (0, 1) specifying the interval range.
+#' @param conf deprecated - please use `interval_width` instead.
 #'
 #' @export
+#'
+#' @importFrom lifecycle deprecate_soft
 #'
 #' @examples
 #' \dontrun{
@@ -79,28 +100,43 @@ summarize_predictions <- summarise_predictions
 #'   add_recipe(recipe(qsec ~ wt, data = mtcars)) %>%
 #'   add_model(linear_reg())
 #'
-#' # evaluate variable importance from 125 models fit to mtcars
+#' # evaluate variable importance from 2000 models fit to mtcars
 #' set.seed(123)
 #' importances <-
 #'   wf %>%
-#'   vi_boots(n = 125, training_data = mtcars, new_data = mtcars)
+#'   vi_boots(n = 2000, training_data = mtcars, new_data = mtcars)
 #'
 #' # append with lower and upper bound importance summary columns
 #' importances %>%
-#'   summarise_importance(conf = 0.95)
+#'   summarise_importance(interval_width = 0.95)
 #' }
 summarise_importance <- function(.data,
-                                 conf = 0.95) {
+                                 interval_width = 0.95,
+                                 conf = NULL) {
+
+  # warn about parameter deprecation
+  if (!is.null(conf)) {
+
+    lifecycle::deprecate_soft(
+      when = "0.2.0",
+      what = "summarise_importance(conf)",
+      with = "summarise_importance(interval_width)"
+    )
+
+    # reassign to interval width
+    interval_width <- conf
+
+  }
 
   # check arguments
   assert_importance_summary(.data)
-  assert_conf(conf)
+  assert_interval(interval_width)
 
   # pass arguments to summarise_generic
   summarise_generic(
     .data = .data,
     nest_col = "importance",
-    conf = conf
+    interval_width = interval_width
   )
 
 }
@@ -115,6 +151,7 @@ summarize_importance <- summarise_importance
 #'
 #' @param .data passed from one of the summarise_* functions
 #' @param nest_col passed from one of the summarise_* functions
+#' @param interval_width passed from one of the summarise_* functions
 #' @param conf passed from one of the summarise_* functions
 #'
 #' @importFrom dplyr mutate
@@ -130,14 +167,14 @@ summarize_importance <- summarise_importance
 #'
 summarise_generic <- function(.data,
                               nest_col,
-                              conf) {
+                              interval_width) {
 
   # internal renaming
   summary <- .data
 
   # determine ci_lower & ci_upper values from conf
-  ci_lower <- (1 - conf)/2
-  ci_upper <- ci_lower + conf
+  int_lower <- (1 - interval_width)/2
+  int_upper <- int_lower + interval_width
 
   # return max row
   n_rows <- nrow(summary)
@@ -149,7 +186,7 @@ summarise_generic <- function(.data,
     summary <-
       dplyr::mutate(
         summary,
-        interval = purrr::map(summary$.preds, ~stats::quantile(.x$model.pred, probs = c(ci_lower, 0.5, ci_upper)))
+        interval = purrr::map(summary$.preds, ~stats::quantile(.x$model.pred, probs = c(int_lower, 0.5, int_upper)))
       )
 
     # vector of lower/med/upper column names
@@ -171,7 +208,7 @@ summarise_generic <- function(.data,
     summary <-
       dplyr::mutate(
         summary,
-        interval = purrr::map(summary$.importances, ~stats::quantile(.x$model.importance, probs = c(ci_lower, 0.5, ci_upper)))
+        interval = purrr::map(summary$.importances, ~stats::quantile(.x$model.importance, probs = c(int_lower, 0.5, int_upper)))
       )
 
     # vector of lower/med/upper column names

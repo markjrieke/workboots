@@ -132,19 +132,19 @@ assert_importance_summary <- function(data) {
 
 }
 
-# Util function for checking conf interval
-assert_conf <- function(conf) {
+# Util function for checkinginterval
+assert_interval <- function(interval_width) {
 
   # numeric
   assertthat::assert_that(
-    is.numeric(conf),
-    msg = "argument `conf` must be numeric."
+    is.numeric(interval_width),
+    msg = "argument `interval_width` must be numeric."
   )
 
   # must be between [0, 1]
   assertthat::assert_that(
-    conf >= 0 && conf <= 1,
-    msg = "argument `conf` must be between [0, 1]."
+    interval_width >= 0 && interval_width <= 1,
+    msg = "argument `interval_width` must be between [0, 1]."
   )
 
 }
