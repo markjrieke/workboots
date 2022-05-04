@@ -9,6 +9,7 @@ predict_boots(
   n = 2000,
   training_data,
   new_data,
+  interval = c("prediction", "confidence"),
   verbose = FALSE,
   ...
 )
@@ -21,6 +22,8 @@ predict_boots(
 \item{training_data}{A tibble or dataframe of data to be resampled and used for training.}
 
 \item{new_data}{A tibble or dataframe used to make predictions.}
+
+\item{interval}{One of \code{prediction}, \code{confidence}. Specifies the interval type to be generated.}
 
 \item{verbose}{A logical. Defaults to \code{FALSE}. If set to \code{TRUE}, prints progress
 of training to console.}
