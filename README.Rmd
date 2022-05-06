@@ -31,9 +31,9 @@ By using [bootstrap resampling](https://en.wikipedia.org/wiki/Bootstrapping_(sta
 
 ## Installation
 
-You can install the released version of `{workboots}` from CRAN or the development version from github with the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) package:
+You can install the released version of workboots from CRAN or the development version from github with the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) package:
 
-```{r, eval = FALSE}
+```{r, eval=FALSE}
 # install from CRAN
 install.packages("workboots")
 
@@ -43,7 +43,7 @@ devtools::install_github("markjrieke/workboots")
 
 ## Usage
 
-`{workboots}` builds on top of the [`{tidymodels}`](https://www.tidymodels.org/) suite of packages. Teaching how to use `{tidymodels}` is beyond the scope of this package, but some helpful resources are linked at the bottom of this README. 
+workboots builds on top of the `{tidymodels}` suite of packages. Teaching how to use tidymodels is beyond the scope of this package, but some helpful resources are linked at the bottom of this README. 
 
 To get started, we'll need to create a workflow.
 
@@ -64,17 +64,17 @@ penguins_train <- training(penguins_split)
 penguins_wf <- 
   workflow() %>%
   add_recipe(recipe(body_mass_g ~ ., data = penguins_train) %>% step_dummy(all_nominal())) %>%
-  add_model(boost_tree("regression") %>% set_engine("xgboost"))
+  add_model(boost_tree("regression"))
 ```
 
-XGBoost can only generate point predictions, but with `{workboots}` we can train many models to generate many predictions and create a summary with lower and upper bounds:
+Boosted tree models can only generate point predictions, but with workboots we can generate a prediction interval for each observation in `penguins_test` by passing the workflow to `predict_boots()`:
 
 ```{r, eval=FALSE}
 library(workboots)
 
 # generate predictions from 2000 bootstrap models
 set.seed(345)
-penguins_preds <-
+penguins_pred_int <-
   penguins_wf %>%
   predict_boots(
     n = 2000,
@@ -82,8 +82,8 @@ penguins_preds <-
     new_data = penguins_test
   )
 
-# summarise predictions with an upper & lower bound
-penguins_preds %>%
+# summarise predictions with a 95% prediction interval
+pengins_pred_int %>%
   summarise_predictions()
 ```
 
@@ -91,16 +91,42 @@ penguins_preds %>%
 library(workboots)
 
 # load data from workboots_support (avoid re-fitting on knit)
-penguins_preds_boot <-readr::read_rds("https://github.com/markjrieke/workboots_support/blob/main/data/penguins_preds.rds?raw=true") 
+penguins_pred_int <-readr::read_rds("https://github.com/markjrieke/workboots_support/blob/main/data/penguins_pred_int.rds?raw=true") 
 
-penguins_preds_boot %>%
+penguins_pred_int %>%
   summarise_predictions()
 ```
 
+Alternatively, we can generate a confidence interval around each prediction by setting the parameter `interval` to `"confidence"`:
+
+```{r, eval=FALSE}
+# generate predictions from 2000 bootstrap models
+set.seed(456)
+penguins_conf_int <- 
+  penguins_wf %>%
+  predict_boots(
+    n = 2000,
+    training_data = penguins_train,
+    new_data = penguins_test,
+    interval = "confidence"
+  )
+
+# summarise with a 95% confidence interval
+penguins_conf_int %>%
+  summarise_predictions()
+```
+
+```{r, echo=FALSE}
+# load data from workboots_support (avoid re-fitting on knit)
+penguins_conf_int <- readr::read_rds("https://github.com/markjrieke/workboots_support/blob/main/data/penguins_conf_int.rds?raw=true")
+
+penguins_conf_int %>%
+  summarise_predictions()
+```
 
 ## Bug reports/feature requests 
 
-This package is still in its infancy --- if you notice a bug, want to request a new feature, or have recommendations on improving documentation, please [open an issue](https://github.com/markjrieke/workboots/issues) in this repository.
+If you notice a bug, want to request a new feature, or have recommendations on improving documentation, please [open an issue](https://github.com/markjrieke/workboots/issues) in this repository.
 
 ### Tidymodels Resources
 
