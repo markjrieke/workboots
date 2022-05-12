@@ -2,7 +2,7 @@
 title: "Estimating Linear Intervals"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Estimating-Linear-Intervals}
+  %\VignetteIndexEntry{Estimating Linear Intervals}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
