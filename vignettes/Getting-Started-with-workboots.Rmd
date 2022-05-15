@@ -40,8 +40,7 @@ library(tidymodels)
 
 # setup data 
 data("car_prices")
-car_prices %>%
-  knitr::kable()
+car_prices 
 ```
 
 The `car_prices` dataset is already well set-up for modeling --- we'll apply a bit of light preprocessing before training a boosted tree model to predict the price.

@@ -107,6 +107,8 @@ ames_boot_pred_int <-
 ```{r, echo=FALSE}
 library(workboots)
 
+options(timeout = 120)
+
 # load data from workboots_support (avoid re-fitting on knit)
 ames_boot_pred_int <- readr::read_rds("https://github.com/markjrieke/workboots_support/blob/main/data/ames_boot_pred_int.rds?raw=true")
 ```
