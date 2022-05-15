@@ -4,8 +4,8 @@
 \alias{summarise_predictions}
 \alias{`summarize_predictions()`}
 \alias{summarize_predictions}
-\title{Append a tibble of predictions returned by \code{predict_boots()} with a prediction
-interval.}
+\title{Append a tibble of predictions returned by \code{predict_boots()} with upper and
+lower bounds.}
 \usage{
 summarise_predictions(.data, interval_width = 0.95, conf = NULL)
 
@@ -23,8 +23,8 @@ Appends the tibble of predictions returned by \code{predict_boots()} with
 three new columns: \code{.pred_lower}, \code{.pred}, and \code{.pred_upper}.
 }
 \description{
-Append a tibble of predictions returned by \code{predict_boots()} with a prediction
-interval.
+Append a tibble of predictions returned by \code{predict_boots()} with upper and
+lower bounds.
 }
 \details{
 Generates a summary of predictions with a upper and lower interval

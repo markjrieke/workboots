@@ -22,7 +22,7 @@ ggplot2::theme_set(
 )
 ```
 
-When using a linear model, we can generate prediction and confidence intervals without much effort. By way of example, we can use workboots to approximate linear model intervals. Let's start by building a baseline model. In this example, we'll predict a home's sale price based on the firs floor's square footage with data from the [Ames housing dataset](https://modeldata.tidymodels.org/reference/ames.html).
+When using a linear model, we can generate prediction and confidence intervals without much effort. By way of example, we can use workboots to approximate linear model intervals. Let's start by building a baseline model. In this example, we'll predict a home's sale price based on the first floor's square footage with data from the [Ames housing dataset](https://modeldata.tidymodels.org/reference/ames.html).
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidymodels)

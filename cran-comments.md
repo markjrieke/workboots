@@ -1,10 +1,10 @@
 ## Release summary
-This is a minor release in the 0.1.* series. In this version I have:
 
-* made internal updates to methodology in `predict_boots()`.
-* updated parameter defaults in `predict_boots()` and `vi_boots()`.
-* added new function `summarise_importance()`.
-* added `summarize_*` alias for `summarise_*` functions.
+This release moves the package to 0.2.0. In this version I have:
+
+* Rearranged column order output of `summarise_*` functions from `*_lower`, `*`, `*_upper` to `*`, `*_lower`, `*_upper`
+* Deprecated `conf` parameter in `summarise_*` functions in favor of `interval_width`.
+* Added support for generating confidence intervals from `predict_boots()`. 
 
 ## R CMD check results
 There were no ERRORs, WARNINGs, or NOTEs.

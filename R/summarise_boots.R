@@ -1,5 +1,5 @@
-#' Append a tibble of predictions returned by `predict_boots()` with a prediction
-#' interval.
+#' Append a tibble of predictions returned by `predict_boots()` with upper and
+#' lower bounds.
 #'
 #' @details Generates a summary of predictions with a upper and lower interval
 #'  range. Presently, the `quantile()` function from the `{stats}` package is

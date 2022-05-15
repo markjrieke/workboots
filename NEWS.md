@@ -3,7 +3,8 @@
 ### Function updates
 
 * Rearranged column order output of `summarise_*` functions from `*_lower`, `*`, `*_upper` to `*`, `*_lower`, `*_upper`
-* Deprecated `conf` parameter in `summarise_*` functions in favor of `interval_width`
+* Deprecated `conf` parameter in `summarise_*` functions in favor of `interval_width`.
+* Added support for generating confidence intervals from `predict_boots()`. 
 
 # workboots 0.1.1
 
