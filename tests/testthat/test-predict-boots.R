@@ -7,7 +7,7 @@ test_wf <- readRDS("data/test_wf.rds")
 test_train <- read.csv("data/test_train.csv")
 test_test <- read.csv("data/test_test.csv")
 
-test_that("predict_boots() returns predictions in expected format", {
+test_that("predict_boots() returns prediction interval in expected format", {
 
   # generate predictions
   expect_warning(
@@ -17,6 +17,34 @@ test_that("predict_boots() returns predictions in expected format", {
         n = 5,
         training_data = test_train,
         new_data = test_test
+      ),
+
+    "At least 2000 resamples recommended for stable results."
+  )
+
+  # tests
+  expect_s3_class(x, c("tbl_df", "tbl", "data.frame"))
+  expect_named(x, c("rowid", ".preds"))
+  expect_named(x$.preds[[1]], c("model", "model.pred"))
+  expect_type(x$rowid, "integer")
+  expect_type(x$.preds, "list")
+  expect_type(x$.preds[[1]]$model, "character")
+  expect_type(x$.preds[[1]]$model.pred, "double")
+  expect_equal(nrow(x), nrow(test_test))
+
+})
+
+test_that("predict_boots() returns confidence interval in expected format", {
+
+  # generate predictions
+  expect_warning(
+    x <-
+      predict_boots(
+        workflow = test_wf,
+        n = 5,
+        training_data = test_train,
+        new_data = test_test,
+        interval = "confidence"
       ),
 
     "At least 2000 resamples recommended for stable results."
