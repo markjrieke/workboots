@@ -45,7 +45,7 @@
 #' # fit and estimate variable importance from 125 bootstrap resampled models
 #' set.seed(123)
 #' wf %>%
-#'   vi_boots(n = 125, training_data = mtcars)
+#'   vi_boots(n = 2000, training_data = mtcars)
 #' }
 vi_boots <- function(workflow,
                      n = 2000,
@@ -112,6 +112,8 @@ vi_boots <- function(workflow,
 #' @importFrom generics fit
 #' @importFrom vip vi
 #' @importFrom workflows extract_fit_engine
+#'
+#' @noRd
 #'
 vi_single_boot <- function(workflow,
                            boot_splits,

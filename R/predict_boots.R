@@ -13,10 +13,12 @@
 #'  `new_data` and a nested list of the model predictions for each observation.
 #'
 #' @param new_data A tibble or dataframe used to make predictions.
+#' @param interval One of `prediction`, `confidence`. Specifies the interval type to be generated.
 #' @inheritParams vi_boots
 #'
 #' @export
 #'
+#' @importFrom rlang arg_match
 #' @importFrom rlang warn
 #' @importFrom rsample bootstraps
 #' @importFrom purrr map_dfc
@@ -34,17 +36,21 @@
 #'   add_recipe(recipe(qsec ~ wt, data = mtcars)) %>%
 #'   add_model(linear_reg())
 #'
-#' # fit and predict 125 bootstrap resampled models to mtcars
+#' # fit and predict 2000 bootstrap resampled models to mtcars
 #' set.seed(123)
 #' wf %>%
-#'   predict_boots(n = 125, training_data = mtcars, new_data = mtcars)
+#'   predict_boots(n = 2000, training_data = mtcars, new_data = mtcars)
 #' }
 predict_boots <- function(workflow,
                           n = 2000,
                           training_data,
                           new_data,
+                          interval = c("prediction", "confidence"),
                           verbose = FALSE,
                           ...) {
+
+  # convert interval type
+  interval <- rlang::arg_match(interval)
 
   # check arguments
   assert_workflow(workflow)
@@ -78,6 +84,7 @@ predict_boots <- function(workflow,
         workflow = workflow,
         boot_splits = training_boots,
         new_data = new_data,
+        interval = interval,
         verbose = verbose,
         index = .x
       )
@@ -131,9 +138,12 @@ predict_boots <- function(workflow,
 #' @importFrom dplyr rename
 #' @importFrom rlang :=
 #'
+#' @noRd
+#'
 predict_single_boot <- function(workflow,
                                 boot_splits,
                                 new_data,
+                                interval,
                                 verbose,
                                 index) {
 
@@ -152,49 +162,55 @@ predict_single_boot <- function(workflow,
   # fit workflow to training data
   model <- generics::fit(workflow, boot_train)
 
+  # predict given model and new data
+  preds <- stats::predict(model, new_data)
+
   # get predicted var name
   pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
   pred_name <- dplyr::pull(pred_name, variable)
 
-  # get training residuals
-  preds_train <- dplyr::pull(stats::predict(model, boot_train), .pred)
-  actuals_train <- dplyr::pull(boot_train, rlang::sym(pred_name))
-  resids_train <- actuals_train - preds_train
-  resids_train <- resids_train - mean(resids_train)
+  # apply prediction interval using bootstrap 632+ estimate
+  # if not, just returns absolute prediction (when summarised, this generates a confidence interval)
+  if (interval == "prediction") {
 
-  # get oob residuals
-  preds_oob <- dplyr::pull(stats::predict(model, boot_oob), .pred)
-  actuals_oob <- dplyr::pull(boot_oob, rlang::sym(pred_name))
-  resids_oob <- actuals_oob - preds_oob
-  resids_oob <- resids_oob - mean(resids_oob)
+    # get training residuals
+    preds_train <- dplyr::pull(stats::predict(model, boot_train), .pred)
+    actuals_train <- dplyr::pull(boot_train, rlang::sym(pred_name))
+    resids_train <- actuals_train - preds_train
+    resids_train <- resids_train - mean(resids_train)
 
-  # calculate no-information error rate (rmse_ni) with RMSE as loss function
-  combos <- tidyr::crossing(actuals_train, preds_train)
-  rmse_ni <- Metrics::rmse(combos$actuals_train, combos$preds_train)
+    # get oob residuals
+    preds_oob <- dplyr::pull(stats::predict(model, boot_oob), .pred)
+    actuals_oob <- dplyr::pull(boot_oob, rlang::sym(pred_name))
+    resids_oob <- actuals_oob - preds_oob
+    resids_oob <- resids_oob - mean(resids_oob)
 
-  # calculate overfit rate
-  rmse_oob <- Metrics::rmse(actuals_oob, preds_oob)
-  rmse_train <- Metrics::rmse(actuals_train, preds_train)
-  overfit <- (rmse_oob - rmse_train)/(rmse_ni - rmse_train)
+    # calculate no-information error rate (rmse_ni) with RMSE as loss function
+    combos <- tidyr::crossing(actuals_train, preds_train)
+    rmse_ni <- Metrics::rmse(combos$actuals_train, combos$preds_train)
 
-  # calculate weight (if overfit = 0, weight = .632 & residual used will just be .632)
-  # uses the actual proportion of distinct training/oob samples, rather than average of 0.632/0.368
-  prop_368 <- nrow(boot_oob)/nrow(boot_train)
-  prop_632 <- 1 - prop_368
-  weight <- prop_632/(1 - (prop_368 * overfit))
+    # calculate overfit rate
+    rmse_oob <- Metrics::rmse(actuals_oob, preds_oob)
+    rmse_train <- Metrics::rmse(actuals_train, preds_train)
+    overfit <- (rmse_oob - rmse_train)/(rmse_ni - rmse_train)
 
-  # determine residual std.dev based on weight
-  sd_oob <- stats::sd(resids_oob)
-  sd_train <- stats::sd(resids_train)
-  sd_resid <- weight * sd_oob + (1 - weight) * sd_train
+    # calculate weight (if overfit = 0, weight = .632 & residual used will just be .632)
+    # uses the actual proportion of distinct training/oob samples, rather than average of 0.632/0.368
+    prop_368 <- nrow(boot_oob)/nrow(boot_train)
+    prop_632 <- 1 - prop_368
+    weight <- prop_632/(1 - (prop_368 * overfit))
 
-  # predict given model and new data
-  preds <- stats::predict(model, new_data)
+    # determine residual std.dev based on weight
+    sd_oob <- stats::sd(resids_oob)
+    sd_train <- stats::sd(resids_train)
+    sd_resid <- weight * sd_oob + (1 - weight) * sd_train
 
-  # add residuals to fit
-  preds <- tibble::add_column(preds, resid_add = stats::rnorm(nrow(new_data), 0, sd_resid))
-  preds <- dplyr::mutate(preds, .pred = .pred + resid_add)
-  preds <- preds[, 1]
+    # add residuals to fit
+    preds <- tibble::add_column(preds, resid_add = stats::rnorm(nrow(new_data), 0, sd_resid))
+    preds <- dplyr::mutate(preds, .pred = .pred + resid_add)
+    preds <- preds[, 1]
+
+  }
 
   # rename .pred col based on index number
   preds <- dplyr::rename(preds, !!rlang::sym(paste0(".pred_", index)) := .pred)

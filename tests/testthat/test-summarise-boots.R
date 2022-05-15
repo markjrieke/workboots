@@ -12,7 +12,7 @@ test_that("summarise_predictions() returns predictions in expected format", {
 
   # tests
   expect_s3_class(x, c("tbl_df", "tbl", "data.frame"))
-  expect_named(x, c("rowid", ".preds", ".pred_lower", ".pred", ".pred_upper"))
+  expect_named(x, c("rowid", ".preds", ".pred", ".pred_lower", ".pred_upper"))
   expect_type(x$.preds, "list")
   expect_type(x$.pred_lower, "double")
   expect_type(x$.pred, "double")
@@ -30,7 +30,7 @@ test_that("summarise_importances() returns importances in expected format", {
 
   # tests
   expect_s3_class(x, c("tbl_df", "tbl", "data.frame"))
-  expect_named(x, c("variable", ".importances", ".importance_lower", ".importance", ".importance_upper"))
+  expect_named(x, c("variable", ".importances", ".importance", ".importance_lower", ".importance_upper"))
   expect_type(x$.importances, "list")
   expect_type(x$.importance_lower, "double")
   expect_type(x$.importance, "double")

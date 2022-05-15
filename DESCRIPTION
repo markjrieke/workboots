@@ -1,6 +1,6 @@
 Package: workboots
 Title: Generate Bootstrap Prediction Intervals from a 'tidymodels' Workflow
-Version: 0.1.1.9000
+Version: 0.2.0
 Authors@R:
     person(given = "Mark",
            family = "Rieke",
@@ -13,12 +13,14 @@ Description: Provides functions for generating bootstrap prediction
     principles. This package is not affiliated with or maintained by
     'RStudio' or the 'tidymodels' maintainers.
 License: MIT + file LICENSE
-URL: https://github.com/markjrieke/workboots
+URL: https://github.com/markjrieke/workboots,
+    https://markjrieke.github.io/workboots/
 BugReports: https://github.com/markjrieke/workboots/issues
 Imports:
     assertthat,
     dplyr,
     generics,
+    lifecycle,
     Metrics,
     purrr,
     rlang,
@@ -33,12 +35,13 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Suggests: 
-    covr,
+    forcats,
     ggplot2,
     knitr,
     readr,
     recipes,
     rmarkdown,
+    scales,
     testthat (>= 3.0.0),
     tidymodels,
     tune,

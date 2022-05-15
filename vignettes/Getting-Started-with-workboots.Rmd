@@ -1,0 +1,267 @@
+---
+title: "Getting Started with workboots"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with workboots}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+
+ggplot2::theme_set(
+  ggplot2::theme_minimal() +
+    ggplot2::theme(plot.title.position = "plot",
+                   plot.background = ggplot2::element_rect(fill = "white", color = "white"))
+)
+```
+
+Sometimes, we want a model that generates a range of possible outcomes around each prediction. Other times, we just care about point predictions and may be able to use a powerful model. workboots allows us to get the best of both worlds --- getting a range of predictions while still using powerful model!
+
+In this vignette, we'll walk through the entire process of building a boosted tree model to predict the range of possible car prices from the [modeldata::car_prices](https://modeldata.tidymodels.org/reference/car_prices.html) dataset. Prior to estimating ranges with workboots, we'll need to build and tune a workflow. This vignette will walk through several steps:
+
+1. Building a baseline model with default parameters.
+2. Tuning and finalizing model parameters.
+3. Predicting price ranges with a tuned workflow.
+4. Estimating variable importance ranges with a tuned workflow.
+
+## Building a baseline model
+
+What's included in the `car_prices` dataset?
+
+```{r}
+library(tidymodels)
+
+# setup data 
+data("car_prices")
+car_prices 
+```
+
+The `car_prices` dataset is already well set-up for modeling --- we'll apply a bit of light preprocessing before training a boosted tree model to predict the price.
+
+```{r}
+# apply global transfomations
+car_prices <-
+  car_prices %>%
+  mutate(Price = log10(Price),
+         Cylinder = as.character(Cylinder),
+         Doors = as.character(Doors))
+
+# split into testing and training
+set.seed(999)
+car_split <- initial_split(car_prices)
+car_train <- training(car_split)
+car_test <- testing(car_split)
+```
+
+We'll save the test data until the very end and use a validation split to evaluate our first model.
+
+```{r}
+set.seed(888)
+car_val_split <- initial_split(car_train)
+car_val_train <- training(car_val_split)
+car_val_test <- testing(car_val_split)
+```
+
+How does an XGBoost model with default parameters perform on this dataset?
+
+```{r}
+car_val_rec <-
+  recipe(Price ~ ., data = car_val_train) %>%
+  step_BoxCox(Mileage) %>%
+  step_dummy(all_nominal())
+
+# fit and predict on our validation set
+set.seed(777)
+car_val_preds <- 
+  workflow() %>%
+  add_recipe(car_val_rec) %>%
+  add_model(boost_tree("regression", engine = "xgboost")) %>%
+  fit(car_val_train) %>%
+  predict(car_val_test) %>%
+  bind_cols(car_val_test)
+
+car_val_preds %>%
+  rmse(truth = Price, estimate = .pred)
+```
+
+We can also plot our predictions against the actual prices to see how the baseline model performs.
+
+```{r}
+car_val_preds %>%
+  ggplot(aes(x = Price, y = .pred)) +
+  geom_point(size = 2, alpha = 0.25) +
+  geom_abline(linetype = "dashed")
+```
+
+We can extract a bit of extra performance by tuning the model parameters --- this is also needed if we want to stray from the default parameters when predicting ranges with the workboots package.
+
+## Tuning model parameters
+
+Boosted tree models have a lot of available tuning parameters --- given our relatively small dataset, we'll just focus on the `mtry` and `trees` parameters.
+
+```{r, eval=FALSE}
+# re-setup recipe with training dataset
+car_rec <- 
+  recipe(Price ~ ., data = car_train) %>%
+  step_BoxCox(Mileage) %>%
+  step_dummy(all_nominal())
+
+# setup model spec 
+car_spec <-
+  boost_tree(
+    mode = "regression",
+    engine = "xgboost",
+    mtry = tune(),
+    trees = tune()
+  )
+
+# combine into workflow
+car_wf <-
+  workflow() %>%
+  add_recipe(car_rec) %>%
+  add_model(car_spec)
+
+# setup cross-validation folds
+set.seed(666)
+car_folds <- vfold_cv(car_train)
+
+# tune model
+set.seed(555)
+car_tune <-
+  tune_grid(
+    car_wf,
+    car_folds,
+    grid = 5
+  )
+```
+
+Tuning gives us *slightly* better performance than the baseline model:
+
+```{r, echo=FALSE}
+# re-setup recipe with training dataset
+car_rec <- 
+  recipe(Price ~ ., data = car_train) %>%
+  step_BoxCox(Mileage) %>%
+  step_dummy(all_nominal())
+
+# setup model spec 
+car_spec <-
+  boost_tree(
+    mode = "regression",
+    engine = "xgboost",
+    mtry = tune(),
+    trees = tune()
+  )
+
+# combine into workflow
+car_wf <-
+  workflow() %>%
+  add_recipe(car_rec) %>%
+  add_model(car_spec)
+
+car_tune <- readr::read_rds("https://github.com/markjrieke/workboots_support/raw/main/data/car_tune.rds")
+```
+
+```{r}
+car_tune %>%
+  show_best("rmse")
+```
+
+Now we can finalize the workflow with the best tuning parameters. With this finalized workflow, we can start predicting intervals with workboots!
+
+```{r}
+car_wf_final <-
+  car_wf %>%
+  finalize_workflow(car_tune %>% select_best("rmse"))
+
+car_wf_final
+```
+
+## Predicting price ranges
+
+To generate a prediction interval for each car's price, we can pass the finalized workflow to `predict_boots()`. 
+
+```{r, eval=FALSE}
+library(workboots)
+
+set.seed(444)
+car_preds <-
+  car_wf_final %>%
+  predict_boots(
+    n = 2000,
+    training_data = car_train,
+    new_data = car_test
+  )
+```
+
+```{r, echo=FALSE}
+library(workboots)
+
+car_preds <- readr::read_rds("https://github.com/markjrieke/workboots_support/raw/main/data/car_preds.rds")
+```
+
+We can summarize the predictions with upper and lower bounds of a prediction interval by passing `car_preds` to `summarise_predictions()`.
+
+```{r}
+car_preds %>%
+  summarise_predictions()
+```
+
+How do our predictions compare against the actual values?
+
+```{r}
+car_preds %>%
+  summarise_predictions() %>%
+  bind_cols(car_test) %>%
+  ggplot(aes(x = Price, 
+             y = .pred,
+             ymin = .pred_lower,
+             ymax = .pred_upper)) +
+  geom_point(size = 2,
+             alpha = 0.25) +
+  geom_errorbar(alpha = 0.25,
+                width = 0.0125) +
+  geom_abline(linetype = "dashed",
+              color = "gray")
+```
+
+## Estimating variable importance
+
+With workboots, we can also estimate variable importance by passing the finalized workflow to `vi_boots()`. This uses [`vip::vi()`](https://koalaverse.github.io/vip/reference/vi.html) under the hood, which doesn't support all the model types that are available in tidymodels --- please refer to [vip's package documentation](https://koalaverse.github.io/vip/articles/vip.html) for a full list of supported models.
+
+```{r, eval=FALSE}
+set.seed(333)
+car_importance <-
+  car_wf_final %>%
+  vi_boots(
+    n = 2000,
+    trainng_data = car_train
+  )
+```
+
+```{r, echo=FALSE}
+car_importance <- readr::read_rds("https://github.com/markjrieke/workboots_support/raw/main/data/car_importance.rds")
+```
+
+Similar to predictions, we can summarise each variable's importance by passing `car_importance` to the function `summarise_importance()` and plot the results.
+
+```{r}
+car_importance %>%
+  summarise_importance() %>%
+  mutate(variable = forcats::fct_reorder(variable, .importance)) %>%
+  ggplot(aes(x = variable,
+             y = .importance,
+             ymin = .importance_lower,
+             ymax = .importance_upper)) +
+  geom_point(size = 2) +
+  geom_errorbar() +
+  coord_flip()
+```
+

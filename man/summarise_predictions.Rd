@@ -4,25 +4,27 @@
 \alias{summarise_predictions}
 \alias{`summarize_predictions()`}
 \alias{summarize_predictions}
-\title{Append a tibble of predictions returned by \code{predict_boots()} with a prediction
-interval.}
+\title{Append a tibble of predictions returned by \code{predict_boots()} with upper and
+lower bounds.}
 \usage{
-summarise_predictions(.data, conf = 0.95)
+summarise_predictions(.data, interval_width = 0.95, conf = NULL)
 
-summarize_predictions(.data, conf = 0.95)
+summarize_predictions(.data, interval_width = 0.95, conf = NULL)
 }
 \arguments{
 \item{.data}{a tibble of predictions returned by \code{predict_boots()}.}
 
-\item{conf}{a value between (0, 1) specifying the interval range.}
+\item{interval_width}{a value between (0, 1) specifying the interval range.}
+
+\item{conf}{deprecated - please use \code{interval_width} instead.}
 }
 \value{
 Appends the tibble of predictions returned by \code{predict_boots()} with
 three new columns: \code{.pred_lower}, \code{.pred}, and \code{.pred_upper}.
 }
 \description{
-Append a tibble of predictions returned by \code{predict_boots()} with a prediction
-interval.
+Append a tibble of predictions returned by \code{predict_boots()} with upper and
+lower bounds.
 }
 \details{
 Generates a summary of predictions with a upper and lower interval
@@ -39,11 +41,11 @@ wf <-
   add_recipe(recipe(qsec ~ wt, data = mtcars)) \%>\%
   add_model(linear_reg())
 
-# fit and predict 125 bootstrap resampled models to mtcars
+# fit and predict 2000 bootstrap resampled models to mtcars
 set.seed(123)
 preds <-
   wf \%>\%
-  predict_boots(n = 125, training_data = mtcars, new_data = mtcars)
+  predict_boots(n = 2000, training_data = mtcars, new_data = mtcars)
 
 # append with prediction interval summary columns
 preds \%>\%

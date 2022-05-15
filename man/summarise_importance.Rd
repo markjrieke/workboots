@@ -6,14 +6,16 @@
 \title{Append a tibble of variable importances returned by \code{vi_boots()} with upper
 and lower bounds.}
 \usage{
-summarise_importance(.data, conf = 0.95)
+summarise_importance(.data, interval_width = 0.95, conf = NULL)
 
-summarize_importance(.data, conf = 0.95)
+summarize_importance(.data, interval_width = 0.95, conf = NULL)
 }
 \arguments{
 \item{.data}{a tibble of variable importances returned by \code{vi_boots()}.}
 
-\item{conf}{a value between (0, 1) specifying the interval range.}
+\item{interval_width}{a value between (0, 1) specifying the interval range.}
+
+\item{conf}{deprecated - please use \code{interval_width} instead.}
 }
 \description{
 Append a tibble of variable importances returned by \code{vi_boots()} with upper
@@ -37,14 +39,14 @@ wf <-
   add_recipe(recipe(qsec ~ wt, data = mtcars)) \%>\%
   add_model(linear_reg())
 
-# evaluate variable importance from 125 models fit to mtcars
+# evaluate variable importance from 2000 models fit to mtcars
 set.seed(123)
 importances <-
   wf \%>\%
-  vi_boots(n = 125, training_data = mtcars, new_data = mtcars)
+  vi_boots(n = 2000, training_data = mtcars, new_data = mtcars)
 
 # append with lower and upper bound importance summary columns
 importances \%>\%
-  summarise_importance(conf = 0.95)
+  summarise_importance(interval_width = 0.95)
 }
 }

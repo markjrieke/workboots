@@ -1,0 +1,9 @@
+url: https://markjrieke.github.io/workboots/
+template:
+  bootstrap: 5
+  bootswatch: yeti
+
+figures:
+  fig.width: 8
+  fig.height: 5.75
+

@@ -9,6 +9,7 @@ predict_boots(
   n = 2000,
   training_data,
   new_data,
+  interval = c("prediction", "confidence"),
   verbose = FALSE,
   ...
 )
@@ -21,6 +22,8 @@ predict_boots(
 \item{training_data}{A tibble or dataframe of data to be resampled and used for training.}
 
 \item{new_data}{A tibble or dataframe used to make predictions.}
+
+\item{interval}{One of \code{prediction}, \code{confidence}. Specifies the interval type to be generated.}
 
 \item{verbose}{A logical. Defaults to \code{FALSE}. If set to \code{TRUE}, prints progress
 of training to console.}
@@ -52,9 +55,9 @@ wf <-
   add_recipe(recipe(qsec ~ wt, data = mtcars)) \%>\%
   add_model(linear_reg())
 
-# fit and predict 125 bootstrap resampled models to mtcars
+# fit and predict 2000 bootstrap resampled models to mtcars
 set.seed(123)
 wf \%>\%
-  predict_boots(n = 125, training_data = mtcars, new_data = mtcars)
+  predict_boots(n = 2000, training_data = mtcars, new_data = mtcars)
 }
 }
