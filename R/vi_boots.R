@@ -1,7 +1,7 @@
 #' Fit and estimate variable importance from a workflow using many bootstrap resamples.
 #'
 #' Generate variable importances from a tidymodel workflow using bootstrap resampling.
-#' `vi_boots()` generates `n` bootstrp resamples, fits a model to each (creating
+#' `vi_boots()` generates `n` bootstrap resamples, fits a model to each (creating
 #' `n` models), then creates `n` estimates of variable importance for each variable
 #' in the model.
 #'
