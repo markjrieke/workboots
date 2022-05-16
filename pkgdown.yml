@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   Estimating-Linear-Intervals: Estimating-Linear-Intervals.html
   Getting-Started-with-workboots: Getting-Started-with-workboots.html
-last_built: 2022-05-16T03:40Z
+last_built: 2022-05-16T03:45Z
 urls:
   reference: https://markjrieke.github.io/workboots/reference
   article: https://markjrieke.github.io/workboots/articles
