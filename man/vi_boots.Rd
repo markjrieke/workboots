@@ -29,7 +29,7 @@ may not utilize every possible predictor.
 }
 \description{
 Generate variable importances from a tidymodel workflow using bootstrap resampling.
-\code{vi_boots()} generates \code{n} bootstrp resamples, fits a model to each (creating
+\code{vi_boots()} generates \code{n} bootstrap resamples, fits a model to each (creating
 \code{n} models), then creates \code{n} estimates of variable importance for each variable
 in the model.
 }
