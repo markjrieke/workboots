@@ -1,10 +1,11 @@
 pandoc: 2.7.3
-pkgdown: 2.0.3
+pkgdown: 2.0.5
 pkgdown_sha: ~
 articles:
   Estimating-Linear-Intervals: Estimating-Linear-Intervals.html
   Getting-Started-with-workboots: Getting-Started-with-workboots.html
-last_built: 2022-05-16T13:06Z
+  The-Math-Behind-workboots: The-Math-Behind-workboots.html
+last_built: 2022-07-05T01:40Z
 urls:
   reference: https://markjrieke.github.io/workboots/reference
   article: https://markjrieke.github.io/workboots/articles
