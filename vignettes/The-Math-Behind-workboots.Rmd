@@ -1,0 +1,231 @@
+---
+title: "The Math Behind workboots"
+output: 
+  html_document:
+    code_folding: hide
+vignette: >
+  %\VignetteIndexEntry{The Math Behind workboots}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+
+ggplot2::theme_set(
+  ggplot2::theme_minimal() +
+    ggplot2::theme(plot.title.position = "plot",
+                   plot.background = ggplot2::element_rect(fill = "white", color = "white"))
+)
+```
+
+Generating prediction intervals with workboots hinges on a few core concepts: bootstrap resampling, estimating prediction error for each resample, and aggregating the resampled prediction errors for each observation. The [`bootstraps()` documentation from {rsample}](https://rsample.tidymodels.org/reference/bootstraps.html) gives a concise definition of bootstrap resampling:
+
+> A bootstrap sample is a sample that is the same size as the original data set that is made using replacement. This results in analysis samples that have multiple replicates of some of the original rows of the data. The assessment set is defined as the rows of the original data that were not included in the bootstrap sample. This is often referred to as the "out-of-bag" (OOB) sample.
+
+This vignette will walk through the details of estimating and aggregating prediction errors --- additional resources can be found in Davison and Hinkley's book, [*Bootstrap Methods and their Application*](https://www.cambridge.org/core/books/bootstrap-methods-and-their-application/ED2FD043579F27952363566DC09CBD6A), or Efron and Tibshirani's paper, [*Improvements on Cross-Validation: The Bootstrap .632+ Method*](https://www.jstor.org/stable/2965703).
+
+### The Bootstrap .632+ Method
+
+*What follows here is largely a summary of [this explanation](https://stats.stackexchange.com/questions/96739/what-is-the-632-rule-in-bootstrapping/96750#96750) of the .632+ error rate by Benjamin Deonovic.*
+
+When working with bootstrap resamples of a dataset, there are two error estimates we can work with: the bootstrap training error and the out-of-bag (oob) error. Using the [Sacramento housing dataset](https://modeldata.tidymodels.org/reference/Sacramento.html), we can estimate the training and oob error for a single bootstrap.
+
+```{r, echo=FALSE}
+library(tidymodels)
+
+# setup our data
+data("Sacramento")
+Sacramento <-
+  Sacramento %>%
+  select(sqft, type, price) %>%
+  mutate(across(c(sqft, price), log10)) 
+
+set.seed(987)
+sacramento_split <- initial_split(Sacramento)
+sacramento_train <- training(sacramento_split)
+sacramento_test <- testing(sacramento_split)
+
+# setup bootstrapped dataset for .632+ example
+sacramento_boots <- bootstraps(sacramento_train, times = 1)
+```
+```{r class.source = 'fold-show'}
+sacramento_boots
+```
+
+Using a [k-nearest-neighbor regression model](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm#k-NN_regression) and [rmse](https://en.wikipedia.org/wiki/Root-mean-square_deviation#:~:text=The%20root%2Dmean%2Dsquare%20deviation,estimator%20and%20the%20values%20observed.) as our error metric, we find that the training and oob error differ, with the training error lesser than the oob error.
+
+```{r, echo=FALSE}
+# setup a workflow to predict price using a knn regressor
+sacramento_recipe <-
+  recipe(price ~ ., data = sacramento_train) %>%
+  step_dummy(all_nominal())
+
+sacramento_spec <-
+  nearest_neighbor() %>%
+  set_mode("regression")
+
+sacramento_wf <-
+  workflow() %>%
+  add_recipe(sacramento_recipe) %>%
+  add_model(sacramento_spec)
+
+set.seed(876)
+sacramento_fit <-
+  sacramento_wf %>%
+  fit(training(sacramento_boots$splits[[1]])) 
+
+# get bootstrap training error
+sacramento_train_err <- 
+  Metrics::rmse(
+    training(sacramento_boots$splits[[1]])$price,
+    sacramento_fit %>% predict(training(sacramento_boots$splits[[1]])) %>% pull(.pred)
+  )
+
+# get oob error
+sacramento_oob_err <-
+  Metrics::rmse(
+    testing(sacramento_boots$splits[[1]])$price,
+    sacramento_fit %>% predict(testing(sacramento_boots$splits[[1]])) %>% pull(.pred)
+  )
+```
+
+```{r, class.source = 'fold-show'}
+sacramento_train_err
+sacramento_oob_err
+```
+
+The training error is overly optimistic in the model's performance and likely to under-estimate the prediction error. We are interested in the model's performance on new data. The oob error, on the other hand, is likely to over-estimate the prediction error! This is due to non-distinct observations in the bootstrap sample that results from sampling with replacement. Given that [the average number of distinct observations in a bootstrap training set is about `0.632 * total_observations`](https://stats.stackexchange.com/questions/88980/why-on-average-does-each-bootstrap-sample-contain-roughly-two-thirds-of-observat?lq=1), Efron and Tibshirani proposed a blend of the training and oob error with the 0.632 estimate:
+
+\begin{align*}
+Err_{.632} & = 0.368 Err_{train} + 0.632 Err_{oob}
+\end{align*}
+
+```{r, class.source = 'fold-show'}
+sacramento_632 <- 0.368 * sacramento_train_err + 0.632 * sacramento_oob_err
+sacramento_632
+```
+
+If, however, the model is highly overfit to the bootstrap training set, the training error will approach 0 and the 0.632 estimate will *under estimate* the prediction error.
+
+An example from [*Applied Predictive Modeling*](http://appliedpredictivemodeling.com/) shows that as model complexity increases, the reported resample accuracy by the 0.632 estimate continues to increase whereas other resampling strategies report diminishing returns:
+
+![](https://user-images.githubusercontent.com/5731043/157986232-9c32c1c2-a7ed-4f9f-b28e-7d8ccb7ac41c.png)
+
+As an alternative to the 0.632 estimate, Efron & Tibshirani also propose the 0.632+ estimate, which re-weights the blend of training and oob error based on the model overfit rate:
+
+\begin{align*}
+Err_{0.632+} & = (1 - w) Err_{train} + w Err_{oob} \\
+\\
+w & = \frac{0.632}{1 - 0.368 R} \\
+\\
+R & = \frac{Err_{oob} - Err_{train}}{\gamma - Err_{train}}
+\end{align*}
+
+Here, $R$ represents the overfit rate and $\gamma$ is the no-information error rate, estimated by evaulating all combinations of predictions and actual values in the bootstrap training set.
+
+```{r, echo=FALSE}
+# estimate the no-information error rate
+preds_train <- predict(sacramento_fit, training(sacramento_boots$splits[[1]])) %>% pull(.pred)
+actuals_train <- training(sacramento_boots$splits[[1]]) %>% pull(price)
+all_combinations <- crossing(actuals_train, preds_train)
+rmse_ni <- Metrics::rmse(all_combinations$actuals_train, all_combinations$preds_train)
+
+# estimate the overfit rate
+overfit <- (sacramento_oob_err - sacramento_train_err)/(rmse_ni - sacramento_train_err)
+
+# estimate weight
+w <- 0.632 / (1 - 0.368 * overfit)
+```
+
+```{r, class.source = 'fold-show'}
+sacramento_632_plus <- (1 - w) * sacramento_train_err + w * sacramento_oob_err
+sacramento_632_plus
+```
+
+When there is no overfitting (i.e., $R = 0$) the 0.632+ estimate will equal the 0.632 estimate. In this case, however, the model is overfitting the training set and the 0.632+ error estimate is pushed a bit closer to the oob error.
+
+### Prediction intervals with many bootstraps
+
+[For an unbiased estimator, rmse is the standard deviation of the residuals](https://en.wikipedia.org/wiki/Root-mean-square_deviation#Formula). With this in mind, we can modify our predictions to include a sample from the residual distribution (for more information, see Algorithm 6.4 from Davison and Hinkley's *Bootstrap Methods and their Application*):
+
+```{r, class.source = 'fold-show'}
+set.seed(999)
+resid_train_add <- rnorm(length(preds_train), 0, sacramento_632_plus)
+
+preds_train_mod <- preds_train + resid_train_add
+```
+
+Thus far, we've been working with a single bootstrap resample. When working with a single bootstrap resample, adding this residual term gives a pretty poor estimate for each observation:
+
+```{r, echo=FALSE}
+library(ggplot2)
+
+tibble(.pred = preds_train_mod) %>%
+  bind_cols(training(sacramento_boots$splits[[1]])) %>%
+  mutate(across(c(.pred, price), ~10^.x)) %>%
+  ggplot(aes(x = .pred, y = price)) +
+  geom_point(alpha = 0.25,
+             size = 2.5,
+             color = "midnightblue") +
+  geom_abline(linetype = "dashed",
+              size = 1, 
+              color = "gray") +
+  labs(title = "Predicted sale price of home in Sacramento",
+       subtitle = "Adding a single error estimate produces poor predictions of price",
+       x = "Predicted price",
+       y = "Actual price") +
+  scale_x_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
+  scale_y_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) 
+  
+```
+
+With workboots, however, we can repeat this process over many bootstrap datasets to generate a prediction distribution for each observation:
+
+```{r, class.source = 'fold-show'}
+library(workboots)
+
+# fit and predict price in sacramento_test from 100 models
+# the default number of resamples is 2000 - dropping here to speed up knitting
+set.seed(555)
+sacramento_pred_int <-
+  sacramento_wf %>%
+  predict_boots(
+    n = 100,
+    training_data = sacramento_train,
+    new_data = sacramento_test
+  )
+```
+
+```{r, echo=FALSE}
+sacramento_pred_int %>%
+  summarise_predictions() %>%
+  bind_cols(sacramento_test) %>%
+  mutate(across(c(.pred:.pred_upper, price), ~ 10^.x)) %>%
+  ggplot(aes(x = .pred,
+             y = price,
+             ymin = .pred_lower,
+             ymax = .pred_upper)) +
+  geom_point(alpha = 0.25,
+             size = 2.5,
+             color = "midnightblue") +
+  geom_errorbar(alpha = 0.25,
+                color = "midnightblue",
+                width = 0.0125) +
+  scale_x_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
+  scale_y_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
+  geom_abline(linetype = "dashed",
+              size = 1,
+              color = "gray") +
+  labs(title = "Predicted sale price of home in Sacramento",
+       subtitle = "Using many resamples allows us to generate prediction intervals",
+       x = "Predicted price",
+       y = "Actual price")
+```
+
+This methodology produces prediction distributions that are [consistent with what we might expect from linear models](https://markjrieke.github.io/workboots/articles/Estimating-Linear-Intervals.html) while making no assumptions about model type (i.e., we can use a non-parametric model; in this case, a k-nearest neighbors regression). 
