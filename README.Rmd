@@ -133,3 +133,5 @@ If you notice a bug, want to request a new feature, or have recommendations on i
 * [Getting started with Tidymodels](https://www.tidymodels.org/start/)
 * [Tidy Modeling with R](https://www.tmwr.org/)
 * [Julia Silge's Blog](https://juliasilge.com/blog/) provides use cases of tidymodels with weekly [#tidytuesday](https://github.com/rfordatascience/tidytuesday) datasets. 
+
+<p style="font-size:10pt; font-style:italic"> The hex logo for workboots was designed by <a style="white-space:nowrap" href="https://www.sarahpowerhouse.com/home">Sarah Power</a>.</p>

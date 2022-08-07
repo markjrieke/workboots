@@ -93,20 +93,21 @@ pengins_pred_int %>%
   summarise_predictions()
 ```
 
-    #> # A tibble: 84 x 5
+    #> # A tibble: 84 × 5
     #>    rowid .preds               .pred .pred_lower .pred_upper
     #>    <int> <list>               <dbl>       <dbl>       <dbl>
-    #>  1     1 <tibble [2,000 x 2]> 3465.       2913.       3994.
-    #>  2     2 <tibble [2,000 x 2]> 3535.       2982.       4100.
-    #>  3     3 <tibble [2,000 x 2]> 3604.       3050.       4187.
-    #>  4     4 <tibble [2,000 x 2]> 4157.       3477.       4764.
-    #>  5     5 <tibble [2,000 x 2]> 3868.       3305.       4372.
-    #>  6     6 <tibble [2,000 x 2]> 3519.       2996.       4078.
-    #>  7     7 <tibble [2,000 x 2]> 3435.       2914.       3954.
-    #>  8     8 <tibble [2,000 x 2]> 4072.       3483.       4653.
-    #>  9     9 <tibble [2,000 x 2]> 3445.       2926.       3966.
-    #> 10    10 <tibble [2,000 x 2]> 3405.       2876.       3938.
-    #> # ... with 74 more rows
+    #>  1     1 <tibble [2,000 × 2]> 3465.       2913.       3994.
+    #>  2     2 <tibble [2,000 × 2]> 3535.       2982.       4100.
+    #>  3     3 <tibble [2,000 × 2]> 3604.       3050.       4187.
+    #>  4     4 <tibble [2,000 × 2]> 4157.       3477.       4764.
+    #>  5     5 <tibble [2,000 × 2]> 3868.       3305.       4372.
+    #>  6     6 <tibble [2,000 × 2]> 3519.       2996.       4078.
+    #>  7     7 <tibble [2,000 × 2]> 3435.       2914.       3954.
+    #>  8     8 <tibble [2,000 × 2]> 4072.       3483.       4653.
+    #>  9     9 <tibble [2,000 × 2]> 3445.       2926.       3966.
+    #> 10    10 <tibble [2,000 × 2]> 3405.       2876.       3938.
+    #> # … with 74 more rows
+    #> # ℹ Use `print(n = ...)` to see more rows
 
 Alternatively, we can generate a confidence interval around each
 prediction by setting the parameter `interval` to `"confidence"`:
@@ -128,20 +129,21 @@ penguins_conf_int %>%
   summarise_predictions()
 ```
 
-    #> # A tibble: 84 x 5
+    #> # A tibble: 84 × 5
     #>    rowid .preds               .pred .pred_lower .pred_upper
     #>    <int> <list>               <dbl>       <dbl>       <dbl>
-    #>  1     1 <tibble [2,000 x 2]> 3466.       3257.       3635.
-    #>  2     2 <tibble [2,000 x 2]> 3534.       3291.       3811.
-    #>  3     3 <tibble [2,000 x 2]> 3623.       3306.       3921.
-    #>  4     4 <tibble [2,000 x 2]> 4155.       3722.       4504.
-    #>  5     5 <tibble [2,000 x 2]> 3868.       3644.       4086.
-    #>  6     6 <tibble [2,000 x 2]> 3509.       3286.       3768.
-    #>  7     7 <tibble [2,000 x 2]> 3439.       3249.       3624.
-    #>  8     8 <tibble [2,000 x 2]> 4064.       3737.       4369.
-    #>  9     9 <tibble [2,000 x 2]> 3450.       3253.       3635.
-    #> 10    10 <tibble [2,000 x 2]> 3405.       3222.       3651.
-    #> # ... with 74 more rows
+    #>  1     1 <tibble [2,000 × 2]> 3466.       3257.       3635.
+    #>  2     2 <tibble [2,000 × 2]> 3534.       3291.       3811.
+    #>  3     3 <tibble [2,000 × 2]> 3623.       3306.       3921.
+    #>  4     4 <tibble [2,000 × 2]> 4155.       3722.       4504.
+    #>  5     5 <tibble [2,000 × 2]> 3868.       3644.       4086.
+    #>  6     6 <tibble [2,000 × 2]> 3509.       3286.       3768.
+    #>  7     7 <tibble [2,000 × 2]> 3439.       3249.       3624.
+    #>  8     8 <tibble [2,000 × 2]> 4064.       3737.       4369.
+    #>  9     9 <tibble [2,000 × 2]> 3450.       3253.       3635.
+    #> 10    10 <tibble [2,000 × 2]> 3405.       3222.       3651.
+    #> # … with 74 more rows
+    #> # ℹ Use `print(n = ...)` to see more rows
 
 ## Bug reports/feature requests
 
@@ -158,3 +160,9 @@ repository.
     cases of tidymodels with weekly
     [\#tidytuesday](https://github.com/rfordatascience/tidytuesday)
     datasets.
+
+<p style="font-size:10pt; font-style:italic">
+The hex logo for workboots was designed by
+<a style="white-space:nowrap" href="https://www.sarahpowerhouse.com/home">Sarah
+Power</a>.
+</p>
