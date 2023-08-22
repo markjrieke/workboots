@@ -1,10 +1,8 @@
 ## Release summary
 
-This release moves the package to 0.2.0. In this version I have:
+This release moves the package to 0.2.1. In this version I have:
 
-* Rearranged column order output of `summarise_*` functions from `*_lower`, `*`, `*_upper` to `*`, `*_lower`, `*_upper`
-* Deprecated `conf` parameter in `summarise_*` functions in favor of `interval_width`.
-* Added support for generating confidence intervals from `predict_boots()`. 
+* Updated package dependencies to depend on vip version 0.4.1. vip 0.4.1 fixes issues that caused vip 0.4.0 to be removed from CRAN.  
 
 ## R CMD check results
 There were no ERRORs, WARNINGs, or NOTEs.
