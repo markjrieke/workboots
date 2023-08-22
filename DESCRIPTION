@@ -1,6 +1,6 @@
 Package: workboots
 Title: Generate Bootstrap Prediction Intervals from a 'tidymodels' Workflow
-Version: 0.2.0.9000
+Version: 0.2.1
 Authors@R:
     person(given = "Mark",
            family = "Rieke",
@@ -28,12 +28,12 @@ Imports:
     stats,
     tibble,
     tidyr,
-    vip,
+    vip (>= 0.4.1),
     workflows
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Suggests: 
     forcats,
     ggplot2,
