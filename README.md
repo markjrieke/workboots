@@ -1,8 +1,8 @@
 
 # workboots <img src="man/figures/logo.png" align="right" width="120" />
 
-**Author:** [Mark Rieke](https://www.thedatadiary.net/about/) <br/>
-**License:**
+**Author:** [Mark Rieke](https://www.thedatadiary.net/about/about/)
+<br/> **License:**
 [MIT](https://github.com/markjrieke/workboots/blob/main/LICENSE)
 
 <!-- badges: start -->
@@ -106,8 +106,7 @@ pengins_pred_int %>%
     #>  8     8 <tibble [2,000 × 2]> 4072.       3483.       4653.
     #>  9     9 <tibble [2,000 × 2]> 3445.       2926.       3966.
     #> 10    10 <tibble [2,000 × 2]> 3405.       2876.       3938.
-    #> # … with 74 more rows
-    #> # ℹ Use `print(n = ...)` to see more rows
+    #> # ℹ 74 more rows
 
 Alternatively, we can generate a confidence interval around each
 prediction by setting the parameter `interval` to `"confidence"`:
@@ -142,8 +141,7 @@ penguins_conf_int %>%
     #>  8     8 <tibble [2,000 × 2]> 4064.       3737.       4369.
     #>  9     9 <tibble [2,000 × 2]> 3450.       3253.       3635.
     #> 10    10 <tibble [2,000 × 2]> 3405.       3222.       3651.
-    #> # … with 74 more rows
-    #> # ℹ Use `print(n = ...)` to see more rows
+    #> # ℹ 74 more rows
 
 ## Bug reports/feature requests
 
@@ -154,12 +152,12 @@ repository.
 
 ### Tidymodels Resources
 
--   [Getting started with Tidymodels](https://www.tidymodels.org/start/)
--   [Tidy Modeling with R](https://www.tmwr.org/)
--   [Julia Silge’s Blog](https://juliasilge.com/blog/) provides use
-    cases of tidymodels with weekly
-    [\#tidytuesday](https://github.com/rfordatascience/tidytuesday)
-    datasets.
+- [Getting started with Tidymodels](https://www.tidymodels.org/start/)
+- [Tidy Modeling with R](https://www.tmwr.org/)
+- [Julia Silge’s Blog](https://juliasilge.com/blog/) provides use cases
+  of tidymodels with weekly
+  [\#tidytuesday](https://github.com/rfordatascience/tidytuesday)
+  datasets.
 
 <p style="font-size:10pt; font-style:italic">
 The hex logo for workboots was designed by
