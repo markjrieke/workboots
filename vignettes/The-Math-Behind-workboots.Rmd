@@ -75,6 +75,7 @@ sacramento_wf <-
   add_recipe(sacramento_recipe) %>%
   add_model(sacramento_spec)
 
+# Fit to the first bootstrap sample 
 set.seed(876)
 sacramento_fit <-
   sacramento_wf %>%
@@ -180,8 +181,8 @@ tibble(.pred = preds_train_mod) %>%
        subtitle = "Adding a single error estimate produces poor predictions of price",
        x = "Predicted price",
        y = "Actual price") +
-  scale_x_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
-  scale_y_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) 
+  scale_x_log10(labels = scales::label_dollar()) +
+  scale_y_log10(labels = scales::label_dollar()) 
   
 ```
 
@@ -190,11 +191,14 @@ With workboots, however, we can repeat this process over many bootstrap datasets
 ```{r, class.source = 'fold-show'}
 library(workboots)
 
+# Fit the to entire training set. 
+sacramento_training_fit <- fit(sacramento_wf, sacramento_train) 
+
 # fit and predict price in sacramento_test from 100 models
 # the default number of resamples is 2000 - dropping here to speed up knitting
 set.seed(555)
 sacramento_pred_int <-
-  sacramento_wf %>%
+  sacramento_training_fit %>%
   predict_boots(
     n = 100,
     training_data = sacramento_train,
@@ -217,8 +221,8 @@ sacramento_pred_int %>%
   geom_errorbar(alpha = 0.25,
                 color = "midnightblue",
                 width = 0.0125) +
-  scale_x_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
-  scale_y_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
+  scale_x_log10(labels = scales::label_dollar()) +
+  scale_y_log10(labels = scales::label_dollar()) +
   geom_abline(linetype = "dashed",
               size = 1,
               color = "gray") +

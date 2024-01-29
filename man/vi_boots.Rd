@@ -7,7 +7,7 @@
 vi_boots(workflow, n = 2000, training_data, verbose = FALSE, ...)
 }
 \arguments{
-\item{workflow}{An un-fitted workflow object.}
+\item{workflow}{An fitted workflow object.}
 
 \item{n}{An integer for the number of bootstrap resampled models that will be created.}
 

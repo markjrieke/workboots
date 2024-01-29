@@ -1,6 +1,8 @@
 # workboots 0.2.1
 
 * Workboots now requires that [`{vip}`](https://koalaverse.github.io/vip/) is at least version 0.4.1 (addresses [`{vip}`'s removal from CRAN](https://github.com/koalaverse/vip/issues/153)).
+* Workflows with formulas (and not recipes) can be used. 
+* [predict_boots()] now requires a _fitted_ workflow. 
 
 # workboots 0.2.0
 

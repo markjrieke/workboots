@@ -55,23 +55,9 @@ assert_n <- function(n) {
 # Util function for checking training_data and new_data params
 assert_pred_data <- function(workflow, data, type) {
 
-  # get colnames from workflow
-  var_info <- workflow$pre$actions$recipe$recipe$var_info
-
-  if (type == "training") {
-
-    # check that colnames include all predictors and outcomes
-    var_info <- dplyr::filter(var_info, role %in% c("predictor", "outcome"))
-
-  } else { # type == "new"
-
-    # check that colnames include all predictors
-    var_info <- dplyr::filter(var_info, role == "predictor")
-
-  }
+  cols_wf <- column_names(workflow, training = type == "training")
 
   # get colnames for comparison
-  cols_wf <- var_info$variable
   cols_dat <- colnames(data)
 
   # check that all cols in wf appear in data
@@ -84,6 +70,16 @@ assert_pred_data <- function(workflow, data, type) {
   )
 
 }
+
+column_names <- function(x, training = TRUE) {
+  col_names <- .get_input_predictors_workflow(x)
+  if (training) {
+    col_names <- c(col_names, .get_input_outcome_workflow(x))
+  }
+  col_names
+}
+
+
 
 # Util function for checking .data passed to summary functions
 assert_pred_summary <- function(data) {

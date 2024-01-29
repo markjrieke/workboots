@@ -1,11 +1,5 @@
-# read in test data
-test_preds <- readRDS("data/test_preds.rds")
-test_importances <- readRDS("data/test_importances.rds")
 
 test_that("summarise_predictions() returns predictions in expected format", {
-
-  # read in data used to make predictions (new_data in predict_boots())
-  test_test <- read.csv("data/test_test.csv")
 
   # generate summary
   x <- summarise_predictions(test_preds)
@@ -39,3 +33,47 @@ test_that("summarise_importances() returns importances in expected format", {
   expect_type(x$.importances[[1]]$model.importance, "double")
 
 })
+
+
+test_that("summarise_predictions() can use formula interface", {
+  skip_if_not_installed("parsnip")
+  suppressPackageStartupMessages(library(workflows))
+  suppressPackageStartupMessages(library(parsnip))
+
+  car_subset <- mtcars[, c("mpg", "disp", "wt")]
+  lm_wflow <- workflow(mpg ~ ., parsnip::linear_reg())
+  lm_fit <- fit(lm_wflow, car_subset)
+
+  new_car <- data.frame(disp = 150.0, wt = 2.5)
+
+  # generate predictions
+  expect_warning(
+    x <-
+      predict_boots(
+        workflow = lm_fit,
+        n = 5,
+        training_data = car_subset,
+        new_data = new_car
+      ),
+
+    "At least 2000 resamples recommended for stable results."
+  )
+
+  # tests
+  # generate summary
+  x <- summarise_predictions(x)
+
+  # tests
+  expect_s3_class(x, c("tbl_df", "tbl", "data.frame"))
+  expect_named(x, c("rowid", ".preds", ".pred", ".pred_lower", ".pred_upper"))
+  expect_type(x$.preds, "list")
+  expect_type(x$.pred_lower, "double")
+  expect_type(x$.pred, "double")
+  expect_type(x$.pred_upper, "double")
+  expect_type(x$.preds[[1]]$model, "character")
+  expect_type(x$.preds[[1]]$model.pred, "double")
+  expect_equal(nrow(x), nrow(new_car))
+
+
+})
+

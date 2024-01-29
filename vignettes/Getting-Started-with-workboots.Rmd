@@ -79,13 +79,13 @@ car_val_rec <-
 
 # fit and predict on our validation set
 set.seed(777)
-car_val_preds <- 
+car_val_fit <- 
   workflow() %>%
   add_recipe(car_val_rec) %>%
   add_model(boost_tree("regression", engine = "xgboost")) %>%
-  fit(car_val_train) %>%
-  predict(car_val_test) %>%
-  bind_cols(car_val_test)
+  fit(car_val_train)
+
+car_val_preds <- augment(car_val_fit, car_val_test)
 
 car_val_preds %>%
   rmse(truth = Price, estimate = .pred)
@@ -182,6 +182,8 @@ car_wf_final <-
   finalize_workflow(car_tune %>% select_best("rmse"))
 
 car_wf_final
+
+car_wf_final_fit <- fit(car_wf_final, car_train)
 ```
 
 ## Predicting price ranges
@@ -193,7 +195,7 @@ library(workboots)
 
 set.seed(444)
 car_preds <-
-  car_wf_final %>%
+  car_wf_final_fit %>%
   predict_boots(
     n = 2000,
     training_data = car_train,
