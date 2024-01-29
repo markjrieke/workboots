@@ -180,8 +180,8 @@ tibble(.pred = preds_train_mod) %>%
        subtitle = "Adding a single error estimate produces poor predictions of price",
        x = "Predicted price",
        y = "Actual price") +
-  scale_x_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
-  scale_y_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) 
+  scale_x_log10(labels = scales::label_dollar()) +
+  scale_y_log10(labels = scales::label_dollar()) 
   
 ```
 
@@ -217,8 +217,8 @@ sacramento_pred_int %>%
   geom_errorbar(alpha = 0.25,
                 color = "midnightblue",
                 width = 0.0125) +
-  scale_x_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
-  scale_y_log10(labels = scales::label_dollar(scale_cut = cut_short_scale())) +
+  scale_x_log10(labels = scales::label_dollar()) +
+  scale_y_log10(labels = scales::label_dollar()) +
   geom_abline(linetype = "dashed",
               size = 1,
               color = "gray") +

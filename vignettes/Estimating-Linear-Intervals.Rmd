@@ -36,7 +36,7 @@ ames_mod %>%
   ggplot(aes(x = First_Flr_SF, y = Sale_Price)) +
   geom_point(alpha = 0.25) +
   scale_x_log10(labels = scales::comma_format()) +
-  scale_y_log10(labels = scales::label_number(scale_cut = scales::cut_short_scale()))
+  scale_y_log10(labels = scales::label_number())
 ```
 
 We can use a linear model to predict the log transform of `Sale_Price` based on the log transform of `First_Flr_SF`and plot our predictions against a holdout set with a prediction interval. 
@@ -79,7 +79,7 @@ ames_lm_pred_int %>%
                   ymax = upr),
               alpha = 0.25) +
   scale_x_log10(labels = scales::comma_format()) +
-  scale_y_log10(labels = scales::label_number(scale_cut = scales::cut_short_scale()))
+  scale_y_log10(labels = scales::label_number())
 ```
 
 We can use workboots to approximate the linear model's prediction interval by passing a workflow built on a linear model to `predict_boots()`.
@@ -129,7 +129,7 @@ ames_boot_pred_int %>%
   geom_point(aes(y = Sale_Price),
              alpha = 0.25) +
   scale_x_log10(labels = scales::comma_format()) +
-  scale_y_log10(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
+  scale_y_log10(labels = scales::label_number()) +
   
   # add prediction interval created by lm()
   geom_line(aes(y = fit),
@@ -185,7 +185,7 @@ ames_boot_pred_int %>%
               alpha = 0.25,
               fill = "blue") +
   scale_x_log10(labels = scales::comma_format()) +
-  scale_y_log10(labels = scales::label_number(scale_cut = scales::cut_short_scale()))
+  scale_y_log10(labels = scales::label_number())
 ```
 
 Alternatively, we can estimate the confidence interval around each prediction by passing the argument `"confidence"` to the `interval` parameter of `predict_boots()`. 
@@ -235,7 +235,7 @@ ames_boot_conf_int %>%
   geom_point(aes(y = Sale_Price),
              alpha = 0.25) +
   scale_x_log10(labels = scales::comma_format()) +
-  scale_y_log10(labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
+  scale_y_log10(labels = scales::label_number()) +
   
   # add prediction interval created by lm()
   geom_line(aes(y = fit),
