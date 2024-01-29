@@ -15,7 +15,7 @@ predict_boots(
 )
 }
 \arguments{
-\item{workflow}{An un-fitted workflow object.}
+\item{workflow}{An fitted workflow object.}
 
 \item{n}{An integer for the number of bootstrap resampled models that will be created.}
 

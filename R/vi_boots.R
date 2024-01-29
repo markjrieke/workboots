@@ -17,7 +17,7 @@
 #'  Similarly, the number of nested rows may vary by model type as some models
 #'  may not utilize every possible predictor.
 #'
-#' @param workflow An un-fitted workflow object.
+#' @param workflow An fitted workflow object.
 #' @param training_data A tibble or dataframe of data to be resampled and used for training.
 #' @param n An integer for the number of bootstrap resampled models that will be created.
 #' @param verbose A logical. Defaults to `FALSE`. If set to `TRUE`, prints progress
