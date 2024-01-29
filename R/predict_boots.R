@@ -166,8 +166,7 @@ predict_single_boot <- function(workflow,
   preds <- stats::predict(model, new_data)
 
   # get predicted var name
-  pred_name <- dplyr::filter(workflow$pre$actions$recipe$recipe$var_info, role == "outcome")
-  pred_name <- dplyr::pull(pred_name, variable)
+  pred_name <- .get_input_outcome_workflow(model)
 
   # apply prediction interval using bootstrap 632+ estimate
   # if not, just returns absolute prediction (when summarised, this generates a confidence interval)
