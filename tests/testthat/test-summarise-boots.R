@@ -1,11 +1,5 @@
-# read in test data
-test_preds <- readRDS("data/test_preds.rds")
-test_importances <- readRDS("data/test_importances.rds")
 
 test_that("summarise_predictions() returns predictions in expected format", {
-
-  # read in data used to make predictions (new_data in predict_boots())
-  test_test <- read.csv("data/test_test.csv")
 
   # generate summary
   x <- summarise_predictions(test_preds)

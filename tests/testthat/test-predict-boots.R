@@ -1,19 +1,16 @@
-# read in data to use in tests
-# test_wf: wf using xgboost to predict body_mass_g from all predictors in the
-#          palmer penguins dataset. one recipe step - step_dummy(all_nominal())
-# test_train: training df of palmer penguins
-# test_test: testing df of palmer penguins
-test_wf <- readRDS("data/test_wf.rds")
-test_train <- read.csv("data/test_train.csv")
-test_test <- read.csv("data/test_test.csv")
 
 test_that("predict_boots() returns prediction interval in expected format", {
+  skip_if_not_installed("xgboost")
+  suppressPackageStartupMessages(library(workflows))
+  suppressPackageStartupMessages(library(parsnip))
+
+  test_wf_fit <- fit(test_wf, test_train)
 
   # generate predictions
   expect_warning(
     x <-
       predict_boots(
-        workflow = test_wf,
+        workflow = test_wf_fit,
         n = 5,
         training_data = test_train,
         new_data = test_test
@@ -35,12 +32,17 @@ test_that("predict_boots() returns prediction interval in expected format", {
 })
 
 test_that("predict_boots() returns confidence interval in expected format", {
+  skip_if_not_installed("xgboost")
+  suppressPackageStartupMessages(library(workflows))
+  suppressPackageStartupMessages(library(parsnip))
+
+  test_wf_fit <- fit(test_wf, test_train)
 
   # generate predictions
   expect_warning(
     x <-
       predict_boots(
-        workflow = test_wf,
+        workflow = test_wf_fit,
         n = 5,
         training_data = test_train,
         new_data = test_test,
@@ -77,10 +79,7 @@ test_that("predict_boots() throws an error when not passed a workflow", {
 
 })
 
-test_that("predict_boots() throws an error when workflow is not final", {
-
-  # load bad wf - same as test_wf but has 1 non-final tuning param
-  test_wf_bad <- readRDS("data/test_wf_bad.rds")
+test_that("predict_boots() throws an error when workflow is not fitted", {
 
   expect_error(
     predict_boots(
@@ -96,10 +95,15 @@ test_that("predict_boots() throws an error when workflow is not final", {
 })
 
 test_that("predict_boots() throws an error when bad n is specified", {
+  skip_if_not_installed("xgboost")
+  suppressPackageStartupMessages(library(workflows))
+  suppressPackageStartupMessages(library(parsnip))
+
+  test_wf_fit <- fit(test_wf, test_train)
 
   expect_error(
     predict_boots(
-      workflow = test_wf,
+      workflow = test_wf_fit,
       n = 0,
       training_data = test_train,
       new_data = test_test
@@ -122,31 +126,33 @@ test_that("predict_boots() throws an error when bad n is specified", {
 })
 
 test_that("predict_boots() throws an error when training_data/new_data doesn't match expected format", {
+  skip_if_not_installed("xgboost")
+  suppressPackageStartupMessages(library(workflows))
+  suppressPackageStartupMessages(library(parsnip))
+
+  test_wf_fit <- fit(test_wf, test_train)
+
 
   # predictors & outcome missing from training_data
-  expect_error(
+  expect_snapshot(
     predict_boots(
-      workflow = test_wf,
+      workflow = test_wf_fit,
       n = 1,
       training_data = test_train[, 3],
       new_data = test_test
     ),
-
-    paste0("missing cols in training_data:\n",
-           "species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, sex, body_mass_g")
+    error = TRUE
   )
 
   # predictors missing from new_data
-  expect_error(
+  expect_snapshot(
     predict_boots(
-      workflow = test_wf,
+      workflow = test_wf_fit,
       n = 1,
       training_data = test_train,
       new_data = test_test[, 3]
     ),
-
-    paste0("missing cols in new_data:\n",
-           "species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, sex")
+    error = TRUE
   )
 
 })
