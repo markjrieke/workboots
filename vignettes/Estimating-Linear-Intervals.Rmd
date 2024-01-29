@@ -93,10 +93,12 @@ ames_wf <-
   add_recipe(recipe(Sale_Price ~ First_Flr_SF, data = ames_train)) %>%
   add_model(linear_reg())
 
+ames_fit <- fit(ames_wf, ames_train)
+
 # generate bootstrap predictions on ames test
 set.seed(713)
 ames_boot_pred_int <- 
-  ames_wf %>%
+  ames_fit %>%
   predict_boots(
     n = 2000,
     training_data = ames_train,
