@@ -1,6 +1,7 @@
 test_that("vi_boots() returns importances in expected format", {
 
   skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
   suppressPackageStartupMessages(library(workflows))
   suppressPackageStartupMessages(library(parsnip))
 
@@ -56,6 +57,7 @@ test_that("vi_boots() throws an error when workflow is not fit", {
 test_that("vi_boots() throws an error when bad n is specified", {
 
   skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
   suppressPackageStartupMessages(library(workflows))
   suppressPackageStartupMessages(library(parsnip))
 
@@ -84,6 +86,7 @@ test_that("vi_boots() throws an error when bad n is specified", {
 test_that("vi_boots() throws an error when training_data doesn't match expected format", {
 
   skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
   suppressPackageStartupMessages(library(workflows))
   suppressPackageStartupMessages(library(parsnip))
 

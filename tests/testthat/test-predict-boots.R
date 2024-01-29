@@ -1,6 +1,7 @@
 
 test_that("predict_boots() returns prediction interval in expected format", {
   skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
   suppressPackageStartupMessages(library(workflows))
   suppressPackageStartupMessages(library(parsnip))
 
@@ -33,6 +34,7 @@ test_that("predict_boots() returns prediction interval in expected format", {
 
 test_that("predict_boots() returns confidence interval in expected format", {
   skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
   suppressPackageStartupMessages(library(workflows))
   suppressPackageStartupMessages(library(parsnip))
 
@@ -96,6 +98,7 @@ test_that("predict_boots() throws an error when workflow is not fitted", {
 
 test_that("predict_boots() throws an error when bad n is specified", {
   skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
   suppressPackageStartupMessages(library(workflows))
   suppressPackageStartupMessages(library(parsnip))
 
@@ -127,6 +130,7 @@ test_that("predict_boots() throws an error when bad n is specified", {
 
 test_that("predict_boots() throws an error when training_data/new_data doesn't match expected format", {
   skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
   suppressPackageStartupMessages(library(workflows))
   suppressPackageStartupMessages(library(parsnip))
 
@@ -154,6 +158,42 @@ test_that("predict_boots() throws an error when training_data/new_data doesn't m
     ),
     error = TRUE
   )
+
+})
+
+test_that("predict_boots() can use formula interface", {
+  skip_if_not_installed("parsnip")
+  suppressPackageStartupMessages(library(workflows))
+  suppressPackageStartupMessages(library(parsnip))
+
+  car_subset <- mtcars[, c("mpg", "disp", "wt")]
+  lm_wflow <- workflow(mpg ~ ., parsnip::linear_reg())
+  lm_fit <- fit(lm_wflow, car_subset)
+
+  new_car <- data.frame(disp = 150.0, wt = 2.5)
+
+  # generate predictions
+  expect_warning(
+    x <-
+      predict_boots(
+        workflow = lm_fit,
+        n = 5,
+        training_data = car_subset,
+        new_data = new_car
+      ),
+
+    "At least 2000 resamples recommended for stable results."
+  )
+
+  # tests
+  expect_s3_class(x, c("tbl_df", "tbl", "data.frame"))
+  expect_named(x, c("rowid", ".preds"))
+  expect_named(x$.preds[[1]], c("model", "model.pred"))
+  expect_type(x$rowid, "integer")
+  expect_type(x$.preds, "list")
+  expect_type(x$.preds[[1]]$model, "character")
+  expect_type(x$.preds[[1]]$model.pred, "double")
+  expect_equal(nrow(x), nrow(new_car))
 
 })
 
